@@ -14,6 +14,20 @@
             "geometry": {
                 "default": "geometry.blockblaster"
             },
+            "animations": {
+                "hold_first_person": "animation.blockblaster.hold_first_person",
+                "hold_third_person": "animation.blockblaster.hold_third_person"
+            },
+            "scripts": {
+                "animate": [
+                    {
+                        "hold_first_person": "context.is_first_person == 1.0"
+                    },
+                    {
+                        "hold_third_person": "context.is_first_person == 0.0"
+                    }
+                ]
+            },
             "render_controllers": ["controller.render.item_default"]
         }
     }
