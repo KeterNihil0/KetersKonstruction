@@ -4,7 +4,8 @@
         "name": "[RP] Keter's Konstruction",
         "description": "Resource pack for Keter's Konstruction",
         "uuid": "c09be411-7788-4024-a9d7-d77641b7c473",
-        "version": [1,0,0]
+        "version": [1,0,0],
+        "min_engine_version": [1, 21, 60]
     },
     "modules": [
         {
