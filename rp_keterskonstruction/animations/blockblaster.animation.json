@@ -1,0 +1,24 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.blockblaster.hold_third_person": {
+			"loop": true,
+			"bones": {
+				"root": {
+					"rotation": [90, 0, 0],
+					"position": [0, -3, -2],
+					"scale": 0.33
+				}
+			}
+		},
+		"animation.blockblaster.hold_first_person": {
+			"loop": true,
+			"bones": {
+				"root": {
+					"rotation": [40.58678, 64.53645, -78.30408],
+					"position": [0, 0, 4]
+				}
+			}
+		}
+	}
+}
