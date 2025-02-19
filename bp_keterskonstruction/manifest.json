@@ -13,6 +13,23 @@
             "description": "...",
             "uuid": "d53185bd-1341-4aec-a3e4-ea72394074fb",
             "version": [1,0,0]
+        },
+        {
+            "uuid": "e31cf904-d5e0-41df-8e4b-e8dd827dea95",
+            "type": "javascript",
+            "language": "javascript",
+            "entry": "scripts/main.js",
+            "version": [1, 0, 0]
+        }
+    ],
+    "dependencies": [
+        {
+            "module_name": "@minecraft/server",
+            "version": "1.17.0"
+        },
+        {
+            "module_name": "@minecraft/server-ui",
+            "version": "1.3.0"
         }
     ]
 }
