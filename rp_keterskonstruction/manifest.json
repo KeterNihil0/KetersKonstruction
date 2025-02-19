@@ -5,7 +5,7 @@
         "description": "Resource pack for Keter's Konstruction",
         "uuid": "fd640240-ade4-427c-a1c2-05de5b06d85b",
         "version": [1,0,0],
-        "min_engine_version": [1, 21, 50]
+        "min_engine_version": [1, 21, 60]
     },
     "modules": [
         {
