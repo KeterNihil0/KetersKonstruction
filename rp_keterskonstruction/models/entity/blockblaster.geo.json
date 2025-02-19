@@ -12,13 +12,13 @@
 			},
 			"bones": [
 				{
-					"name": "root",
+					"name": "rightitem",
 					"pivot": [0, 0, 0],
 					"binding": "q.item_slot_to_bone_name(c.item_slot)"
 				},
 				{
 					"name": "handle",
-					"parent": "root",
+					"parent": "rightitem",
 					"pivot": [0, -1, -2],
 					"cubes": [
 						{"origin": [-2, -7, 6], "size": [4, 11, 2], "pivot": [0, -2, 7], "rotation": [37.5, 0, 0], "uv": [-2, 0]},
@@ -27,7 +27,7 @@
 				},
 				{
 					"name": "body",
-					"parent": "root",
+					"parent": "rightitem",
 					"pivot": [0, -2, 3],
 					"cubes": [
 						{"origin": [-7, -19, -16], "size": [14, 14, 27], "uv": [-37, -25]}
