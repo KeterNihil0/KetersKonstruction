@@ -13,7 +13,10 @@
             },
             "minecraft:tags": {
                 "tags": ["minecraft:is_tool"]
-            }
+            },
+            "minecraft:custom_components": [
+                "kkons:paletteknife"
+            ]
         }
     }
 }
