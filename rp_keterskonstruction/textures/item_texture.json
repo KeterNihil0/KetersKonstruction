@@ -1,0 +1,9 @@
+{
+    "resource_pack_name": "kkons",
+    "texture_name": "item.atlas",
+    "texture_data": {
+        "paletteknife": {
+            "textures": ["textures/kkons/items/tools/paletteknife"]
+        }
+    }
+}
