@@ -15,6 +15,11 @@
             },
             "minecraft:tags": {
                 "tags": ["minecraft:is_tool"]
+            },
+
+            "minecraft:use_modifiers": {
+                "movement_modifier": 0.2,
+                "use_duration": 0
             }
         }
     }
