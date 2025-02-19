@@ -1,0 +1,17 @@
+{
+    "format_version": 2,
+    "header": {
+        "name": "[RP] Keter's Konstruction",
+        "description": "Resourcepack for Keter's Konstruction",
+        "uuid": "c09be411-7788-4024-a9d7-d77641b7c473",
+        "version": [1,0,0]
+    },
+    "modules": [
+        {
+            "type": "resources",
+            "description": "...",
+            "uuid": "ccce6b26-3228-4127-aac0-64b28225da5e",
+            "version": [1,0,0]
+        }
+    ]
+}
