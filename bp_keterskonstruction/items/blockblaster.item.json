@@ -3,10 +3,6 @@
     "minecraft:item": {
         "description": {
             "identifier": "kkons:blockblaster",
-            "menu_category": {
-                "category": "equipment",
-                "group": "minecraft:itemGroup.name.kkons_tools"
-            },
             "is_experimental": true
         },
         "components": {
