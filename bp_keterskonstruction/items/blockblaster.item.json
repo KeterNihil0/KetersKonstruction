@@ -9,8 +9,8 @@
             }
         },
         "components": {
-            "minecraft:hand_equipped": true,
-            //"minecraft:use_animation":"crossbow",
+            //"minecraft:hand_equipped": true,
+            "minecraft:use_animation":"crossbow",
             "minecraft:icon": "stick",
             "minecraft:durability": {
                 "max_durability": 128
