@@ -1,0 +1,17 @@
+{
+    "format_version": 2,
+    "header": {
+        "name": "[RP] Keter's Konstruction",
+        "description": "Behaviour pack for Keter's Konstruction",
+        "uuid": "85c1452d-9ce7-4bb8-82ec-b50428cb9146",
+        "version": [1,0,0]
+    },
+    "modules": [
+        {
+            "type": "data",
+            "description": "...",
+            "uuid": "30bb26c5-83a2-47cd-bd1d-12175ce1bbd2",
+            "version": [1,0,0]
+        }
+    ]
+}
