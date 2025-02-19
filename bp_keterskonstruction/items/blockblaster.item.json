@@ -19,7 +19,7 @@
 
             "minecraft:use_modifiers": {
                 "movement_modifier": 0.2,
-                "use_duration": 99999
+                "use_duration": 9999
             },
             "minecraft:shooter": {
                 "ammunition": [
