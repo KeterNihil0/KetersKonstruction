@@ -4,7 +4,8 @@
         "name": "[RP] Keter's Konstruction",
         "description": "Behaviour pack for Keter's Konstruction",
         "uuid": "85c1452d-9ce7-4bb8-82ec-b50428cb9146",
-        "version": [1,0,0]
+        "version": [1,0,0],
+        "min_engine_version": [1, 21, 60]
     },
     "modules": [
         {
