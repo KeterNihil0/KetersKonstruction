@@ -1,0 +1,20 @@
+{
+    "format_version": "1.21.60",
+    "minecraft:item": {
+        "description": {
+            "identifier": "kkons:blockblaster",
+            "menu_category": {
+                "category": "equipment",
+                "group": "kkons:itemGroup.name.blasters"
+            }
+        },
+        "components": {
+            "minecraft:hand_equipped": true,
+            "minecraft:use_animation":"crossbow",
+            "minecraft:icon": "stick",
+            "minecraft:durability": {
+                "max_durability": 128
+            }
+        }
+    }
+}
