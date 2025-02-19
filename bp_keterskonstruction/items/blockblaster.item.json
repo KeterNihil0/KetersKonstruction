@@ -19,6 +19,9 @@
             },
             "minecraft:tags": {
                 "tags": ["minecraft:is_tool"]
+            },
+            "minecraft:wearable": {
+                "slot": "slot.equippable"
             }
         }
     }
