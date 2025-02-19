@@ -3,15 +3,15 @@
     "header": {
         "name": "[RP] Keter's Konstruction",
         "description": "Behaviour pack for Keter's Konstruction",
-        "uuid": "85c1452d-9ce7-4bb8-82ec-b50428cb9146",
+        "uuid": "02ee5cbe-1099-4e27-9cd4-d60337fe6cec",
         "version": [1,0,0],
-        "min_engine_version": [1, 21, 60]
+        "min_engine_version": [1, 21, 50]
     },
     "modules": [
         {
             "type": "data",
             "description": "...",
-            "uuid": "30bb26c5-83a2-47cd-bd1d-12175ce1bbd2",
+            "uuid": "d53185bd-1341-4aec-a3e4-ea72394074fb",
             "version": [1,0,0]
         }
     ]

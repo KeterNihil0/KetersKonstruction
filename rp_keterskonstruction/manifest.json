@@ -3,15 +3,15 @@
     "header": {
         "name": "[RP] Keter's Konstruction",
         "description": "Resource pack for Keter's Konstruction",
-        "uuid": "c09be411-7788-4024-a9d7-d77641b7c473",
+        "uuid": "fd640240-ade4-427c-a1c2-05de5b06d85b",
         "version": [1,0,0],
-        "min_engine_version": [1, 21, 60]
+        "min_engine_version": [1, 21, 50]
     },
     "modules": [
         {
             "type": "resources",
             "description": "...",
-            "uuid": "ccce6b26-3228-4127-aac0-64b28225da5e",
+            "uuid": "1a81e2c7-c397-4666-95eb-080de3005f95",
             "version": [1,0,0]
         }
     ]
