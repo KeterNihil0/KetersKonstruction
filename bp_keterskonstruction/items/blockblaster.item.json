@@ -18,7 +18,7 @@
             },
             "minecraft:use_modifiers": {
                 "movement_modifier": 0.5,
-                "use_duration": 20
+                "use_duration": 2
             },
             "minecraft:tags": {
                 "tags": ["minecraft:is_tool"]
