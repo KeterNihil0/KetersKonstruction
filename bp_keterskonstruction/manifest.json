@@ -16,7 +16,7 @@
         },
         {
             "uuid": "e31cf904-d5e0-41df-8e4b-e8dd827dea95",
-            "type": "javascript",
+            "type": "script",
             "language": "javascript",
             "entry": "scripts/main.js",
             "version": [1, 0, 0]
