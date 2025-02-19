@@ -11,7 +11,7 @@
         },
         "components": {
             "minecraft:hand_equipped": true,
-            "minecraft:use_animation":"bow",
+            "minecraft:use_animation":"crossbow",
             "minecraft:icon": "stick",
             "minecraft:durability": {
                 "max_durability": 128
@@ -22,6 +22,23 @@
             },
             "minecraft:tags": {
                 "tags": ["minecraft:is_tool"]
+            },
+            "minecraft:shooter": {
+                "ammunition": [
+                    {
+                        "item": "arrow",
+                        "use_offhand": true,
+                        "search_inventory": true,
+                        "use_in_creative": true
+                    }
+                ],
+                "max_draw_duration": 1,
+                "scale_power_by_draw_duration": true,
+                "charge_on_draw": false
+            },
+            "minecraft:projectile": {
+                "minimum_critical_power": 1.25,
+                "projectile_entity": "arrow"
             }
         }
     }
