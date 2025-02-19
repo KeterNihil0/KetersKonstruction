@@ -5,7 +5,7 @@
             "identifier": "kkons:blockblaster",
             "menu_category": {
                 "category": "equipment",
-                "group": "kkons:itemGroup.name.tools"
+                "group": "minecraft:itemGroup.name.kkons_tools"
             },
             "is_experimental": true
         },
