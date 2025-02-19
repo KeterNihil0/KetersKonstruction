@@ -1,6 +1,6 @@
 {
     "resource_pack_name": "kkons",
-    "texture_name": "items.atlas",
+    "texture_name": "atlas.items",
     "texture_data": {
         "paletteknife": {
             "textures": ["textures/kkons/items/tools/paletteknife"]
