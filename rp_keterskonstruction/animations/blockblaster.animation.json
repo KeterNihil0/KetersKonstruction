@@ -6,7 +6,7 @@
 			"bones": {
 				"rightitem": {
 					"rotation": [12.5, 0, 0],
-					"position": [0.5, 22, 0],
+					"position": [0.5, 11, 0],
 					"scale": 0.4
 				}
 			}
@@ -16,7 +16,7 @@
 			"bones": {
 				"rightitem": {
 					"rotation": [79.03779, 59.16247, -39.17816],
-					"position": [4, 20, 8]
+					"position": [4, 6, 8]
 				}
 			}
 		}
