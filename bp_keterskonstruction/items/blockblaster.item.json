@@ -6,14 +6,19 @@
             "menu_category": {
                 "category": "equipment",
                 "group": "kkons:itemGroup.name.blasters"
-            }
+            },
+            "is_experimental": true
         },
         "components": {
-            //"minecraft:hand_equipped": true,
+            "minecraft:hand_equipped": true,
             "minecraft:use_animation":"crossbow",
             "minecraft:icon": "stick",
             "minecraft:durability": {
                 "max_durability": 128
+            },
+            "minecraft:use_modifiers": {
+                "movement_modifier": 0.5,
+                "use_duration": 20
             }
         }
     }
