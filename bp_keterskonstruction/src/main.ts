@@ -59,7 +59,6 @@ const PaletteKnife = {
                 let playerItem = new ItemStack(playerCont.getItem(pi[rand]).typeId, playerCont.getItem(pi[rand]).amount);
                 if(playerItem.amount-1!=0) {playerItem.amount-=1; playerCont.setItem(pi[rand],playerItem);}
                 else {source.runCommandAsync(`replaceitem entity @s slot.hotbar ${pi[rand]} air`)}
-                
             }
         }
     }
