@@ -1,0 +1,15 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.blobblaster.third_person": {
+			"loop": true,
+			"bones": {
+				"item": {
+					"rotation": [90, 0, 0],
+					"position": [0, 23, -3],
+					"scale": 0.5
+				}
+			}
+		}
+	}
+}

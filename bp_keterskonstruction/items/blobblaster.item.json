@@ -11,6 +11,10 @@
             "minecraft:cooldown": {
                 "category": "use_animation",
                 "duration": 0.2
+            },
+            "minecraft:use_modifiers": {
+                "use_duration": 1,
+                "movement_modifier": 0.6
             }
         }
     }

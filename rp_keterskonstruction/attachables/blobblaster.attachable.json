@@ -1,0 +1,30 @@
+{
+    "format_version": "1.8.0",
+    "minecraft:attachable": {
+        "description": {
+            "identifier": "kkons:blobblaster",
+            "materials": {
+                "default": "entity_alphatest",
+                "enchanted": "entity_alphatest_glint"
+            },
+            "geometry": {
+                "default": "geometry.blobblaster"
+            },
+            "textures": {
+                "default": "textures/kkons/items/tools/blobblaster/blobblaster",
+                "enchanted": "textures/misc/enchanted_item_glint"
+            },
+            "scripts": {
+                "animate": [
+                    {"third_person":"!q.is_first_person"}
+                ]
+            },
+            "animations": {
+                "third_person":"animation.blobblaster.third_person"
+            },
+            "render_controllers": [
+                "controller.render.item_default"
+            ]
+        }
+    }
+}
