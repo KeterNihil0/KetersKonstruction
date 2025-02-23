@@ -40,7 +40,7 @@ const PaletteKnife = {
             let pi = []
 
             //finds useable items in inventory
-            ////needs better check
+            ////needs better check, currently attempts to use non-placeable items, but the thrown error prevents issues on user end
             let playerInv = source.getComponent('minecraft:inventory') as EntityInventoryComponent;
             let playerCont = playerInv.container;
             for (let i = 0; i < 9; i++) {
@@ -53,12 +53,15 @@ const PaletteKnife = {
             }
 
             if (pt.length > 0) {
-                //randomly select valid item from the list then places it, whilst also decreasing stack size
+                //randomly select item from the list then places it, whilst also decreasing stack size
                 const rand = Math.floor(Math.random()*pt.length);
                 source.dimension.getBlock(MathUtils.addVectors(block.location,blockOffset)).setType(pt[rand]);
                 let playerItem = new ItemStack(playerCont.getItem(pi[rand]).typeId, playerCont.getItem(pi[rand]).amount);
-                if(playerItem.amount-1!=0) {playerItem.amount-=1; playerCont.setItem(pi[rand],playerItem);}
-                else {source.runCommandAsync(`replaceitem entity @s slot.hotbar ${pi[rand]} air`)}
+                if(source.getGameMode() == "survival") {
+                    source.runCommand(`say ${source.getGameMode()}`)
+                    if(playerItem.amount-1!=0) {playerItem.amount-=1; playerCont.setItem(pi[rand],playerItem);}
+                    else {source.runCommandAsync(`replaceitem entity @s slot.hotbar ${pi[rand]} air`)}
+                }
             }
         }
     }
