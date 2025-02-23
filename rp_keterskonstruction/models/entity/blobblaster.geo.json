@@ -6,22 +6,21 @@
 				"identifier": "geometry.blobblaster",
 				"texture_width": 64,
 				"texture_height": 64,
-				"visible_bounds_width": 2,
-				"visible_bounds_height": 1.5,
-				"visible_bounds_offset": [0, 0.25, 0]
+				"visible_bounds_width": 5,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
 			},
 			"bones": [
 				{
-					"name": "item",
+					"name": "b_main",
 					"pivot": [0, 0, 0],
 					"binding": "q.item_slot_to_bone_name(c.item_slot)"
 				},
 				{
 					"name": "b_handle",
-					"parent": "item",
+					"parent": "b_main",
 					"pivot": [0, -1, 4],
 					"rotation": [-42.5, 0, 0],
-					"binding": "q.item_slot_to_bone_name(c.item_slot)",
 					"cubes": [
 						{
 							"origin": [-2, -5, -5],
@@ -39,7 +38,7 @@
 				},
 				{
 					"name": "b_body",
-					"parent": "item",
+					"parent": "b_main",
 					"pivot": [0, 12, 0],
 					"cubes": [
 						{

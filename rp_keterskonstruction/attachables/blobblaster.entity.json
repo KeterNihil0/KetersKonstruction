@@ -1,5 +1,5 @@
 {
-    "format_version": "1.8.0",
+    "format_version": "1.10.0",
     "minecraft:attachable": {
         "description": {
             "identifier": "kkons:blobblaster",
@@ -16,11 +16,13 @@
             },
             "scripts": {
                 "animate": [
-                    {"third_person":"!q.is_first_person"}
+                    {"third_person":"context.is_first_person == 0"},
+                    {"first_person":"context.is_first_person == 1"}
                 ]
             },
             "animations": {
-                "third_person":"animation.blobblaster.third_person"
+                "third_person":"animation.blobblaster.third_person",
+                "first_person":"animation.blobblaster.first_person"
             },
             "render_controllers": [
                 "controller.render.item_default"
