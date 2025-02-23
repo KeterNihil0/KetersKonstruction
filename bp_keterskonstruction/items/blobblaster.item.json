@@ -5,7 +5,7 @@
             "identifier": "kkons:blobblaster"
         },
         "components": {
-            "minecraft:icon": "stick",
+            "minecraft:icon": "paletteknife",
             "minecraft:hand_equipped": true,
             "minecraft:use_animation": "bow",
             "minecraft:cooldown": {

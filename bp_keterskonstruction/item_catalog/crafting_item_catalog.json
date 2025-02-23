@@ -7,7 +7,7 @@
           "groups": [
             {
               "group_identifier": {
-                "icon": "paletteknife",
+                "icon": "kkons:paletteknife",
                 "name": "kkons:tools"
               },
               "items": [
