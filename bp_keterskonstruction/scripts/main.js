@@ -52,7 +52,6 @@ const PaletteKnife = {
                 source.dimension.getBlock(MathUtils.addVectors(block.location, blockOffset)).setType(pt[rand]);
                 let playerItem = new ItemStack(playerCont.getItem(pi[rand]).typeId, playerCont.getItem(pi[rand]).amount);
                 if (source.getGameMode() == "survival") {
-                    source.runCommand(`say ${source.getGameMode()}`);
                     if (playerItem.amount - 1 != 0) {
                         playerItem.amount -= 1;
                         playerCont.setItem(pi[rand], playerItem);
