@@ -7,11 +7,12 @@
           "groups": [
             {
               "group_identifier": {
-                "icon": "minecraft:apple",
+                "icon": "kknos:paletteknife",
                 "name": "kkons:tools"
               },
               "items": [
-                "kkons:paletteknife"
+                "kkons:paletteknife",
+                "kkons:blobblaster"
               ]
             }
           ]

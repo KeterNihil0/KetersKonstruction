@@ -1,0 +1,17 @@
+{
+    "format_version": "1.21.60",
+    "minecraft:item": {
+        "description": {
+            "identifier": "kkons:blobblaster"
+        },
+        "components": {
+            "minecraft:icon": "stick",
+            "minecraft:hand_equipped": true,
+            "minecraft:use_animation": "bow",
+            "minecraft:cooldown": {
+                "category": "use_animation",
+                "duration": 0.2
+            }
+        }
+    }
+}
