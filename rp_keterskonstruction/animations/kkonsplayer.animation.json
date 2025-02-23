@@ -3,14 +3,11 @@
 	"animations": {
 		"animation.kkonsplayer.blobblaster": {
 			"loop": true,
+			"override_previous_animation": true,
 			"bones": {
-                "rightArm": {
-                    "rotation": [
-                      "!v.is_first_person ? (query.target_x_rotation - 90.0 - this) : 0",
-                      "!v.is_first_person ? (query.target_y_rotation) : 0",
-                      "!v.is_first_person ? this : 0"
-                    ]
-                  }
+				"rightArm": {
+					"rotation": ["v.is_first_person? this :-90+q.head_x_rotation", "v.is_first_person? this : q.head_y_rotation ", 0]
+				}
 			}
 		}
 	}
