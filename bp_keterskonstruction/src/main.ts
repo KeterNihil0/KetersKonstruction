@@ -1,4 +1,4 @@
-import { Block, EntityInventoryComponent, ItemComponentTypes, ItemStack, Player, world as w } from "@minecraft/server";
+import { Block, EntityComponentTypes, EntityInventoryComponent, ItemComponentTypes, ItemDurabilityComponent, ItemStack, Player, system as s, world as w } from "@minecraft/server";
 import { MathUtils } from "mathUtils";
 
 const PaletteKnife = {
@@ -66,8 +66,68 @@ const PaletteKnife = {
     }
 };
 
+w.afterEvents.itemReleaseUse.subscribe((data)=> {
+    const source = data.source;
+    try {
+        source.removeTag("using_blobblaster");
+    } catch (error) {
+        
+    }
+})
+
+w.afterEvents.itemStartUse.subscribe((data)=> {
+    const source = data.source;
+    let itemstack = data.itemStack;
+    try {
+        source.addTag("using_blobblaster");
+    } catch (error) {
+        
+    }
+
+    source.runCommand(`tag @s list`)
+
+    if (source.hasTag("using_blobblaster")) {
+        let durability = itemstack.getComponent(ItemComponentTypes.Durability) as ItemDurabilityComponent;
+        durability.damage = durability.damage - 1;
+        source.runCommand(`say ${durability}`)
+    }
+
+})
+
+s.runInterval(() => {
+    const players = w.getAllPlayers();
+    players.forEach(player => {
+        if (player.getTags().includes("using_blobblaster")) {
+            let projectile = player.dimension.spawnEntity("arrow",MathUtils.addVectors(player.location,{x:0,y:1.8,z:0}));
+            let playerInv = player.getComponent('minecraft:inventory') as EntityInventoryComponent;
+            let playerCont = playerInv.container;
+
+            projectile.applyImpulse({x:player.getViewDirection().x*2, 
+                y:player.getViewDirection().y*2+0.2, 
+                z:player.getViewDirection().z*2})
+
+            let durability = playerCont.getItem(player.selectedSlotIndex).getComponent(ItemComponentTypes.Durability) as ItemDurabilityComponent
+            durability.damage = durability.damage +1;
+            
+            
+        }
+    });
+},5)
+
+
+const BlobBlaster = {
+    onUse(event) {
+        let source = event.source as Player;
+        let itemstack = event.itemstack as ItemStack;
+        
+        source.runCommandAsync(`playanimation @s animation.kkonsplayer.blobblaster root 0.001 "!query.is_using_item"`);
+
+    }
+};
+
 w.beforeEvents.worldInitialize.subscribe(({ itemComponentRegistry }) => {
     itemComponentRegistry.registerCustomComponent("kkons:paletteknife", PaletteKnife);
+    itemComponentRegistry.registerCustomComponent("kkons:blobblaster", BlobBlaster);
 });
 
 

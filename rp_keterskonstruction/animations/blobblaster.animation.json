@@ -1,0 +1,32 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.blobblaster.third_person": {
+			"loop": true,
+			"bones": {
+				"b_main": {
+					"rotation": [90, 0, 0],
+					"position": [0, 23, -3],
+					"scale": 0.5
+				},
+				"rightArm": {
+					"rotation": [
+					  "!v.is_first_person ? (query.target_x_rotation - 90.0 + math.sin(query.life_time * 76.8) * 2.865 - this) : 0",
+					  "!v.is_first_person ? (query.target_y_rotation - 5.73) : 0",
+					  "!v.is_first_person ? ((math.cos(query.life_time * 103.2) * 2.865) + 2.865) : 0"
+					]
+				  }
+			}
+		},
+		"animation.blobblaster.first_person": {
+			"loop": true,
+			"bones": {
+				"b_main": {
+					"rotation": [90, 65, -45],
+					"position": [8, 17, 13],
+					"scale": 1.5
+				}
+			}
+		}
+	}
+}

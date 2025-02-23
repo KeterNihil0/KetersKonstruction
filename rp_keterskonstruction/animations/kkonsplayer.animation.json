@@ -1,0 +1,17 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.kkonsplayer.blobblaster": {
+			"loop": true,
+			"bones": {
+                "rightArm": {
+                    "rotation": [
+                      "!v.is_first_person ? (query.target_x_rotation - 90.0 - this) : 0",
+                      "!v.is_first_person ? (query.target_y_rotation) : 0",
+                      "!v.is_first_person ? this : 0"
+                    ]
+                  }
+			}
+		}
+	}
+}
