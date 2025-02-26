@@ -1,0 +1,31 @@
+{
+    "format_version": "1.21.60",
+    "minecraft:block": {
+        "description": {
+            "identifier": "kkons:blobblaster_block_sandy",
+            "states": {
+                "kkons:falling": [false, true]
+            }
+        },
+        "components": {
+            "minecraft:material_instances": {
+                "*": {
+                    "render_method": "blend",
+                    "texture": "blobblaster_block_sandy",
+                    "ambient_occlusion":false
+                }
+            },
+            "minecraft:light_dampening": 0,
+            "minecraft:loot": "loot_tables/none.json",
+            
+            "minecraft:tick": {
+                "interval_range": [5,20],
+                "looping": true
+            },
+            "minecraft:custom_components": [
+                "kkons:gravity_block",
+                "kkons:goo_interact"
+            ]
+        }
+    }
+}

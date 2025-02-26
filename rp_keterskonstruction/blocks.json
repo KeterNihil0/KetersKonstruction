@@ -1,0 +1,15 @@
+{
+    "format_version":"1.21.40",
+    "kkons:blobblaster_block_goo": {
+        "textures": "blobblaster_block_goo",
+        "sound": "slime"
+    },
+    "kkons:blobblaster_block_sandy": {
+        "textures": "blobblaster_block_sandy",
+        "sound": "slime"
+    },
+    "kkons:blobblaster_block_virus": {
+        "textures": "blobblaster_block_virus",
+        "sound": "slime"
+    }
+}

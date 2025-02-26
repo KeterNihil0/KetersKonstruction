@@ -20,6 +20,16 @@
 					"scale": 1.5
 				}
 			}
+		},
+		"animation.blobblaster.first_person_use": {
+			"loop": true,
+			"bones": {
+				"b_main": {
+					"rotation": ["90 + 2*(math.sin(q.life_time*1000))", 65, -45],
+					"position": [8, 17, 13],
+					"scale": 1.5
+				}
+			}
 		}
 	}
 }

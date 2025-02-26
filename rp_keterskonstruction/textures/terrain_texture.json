@@ -1,0 +1,15 @@
+{
+    "resource_pack_name": "kkons",
+    "texture_name": "atlas.terrain",
+    "texture_data": {
+        "blobblaster_block_goo": {
+            "textures": ["textures/kkons/blocks/blobblaster/blobblaster_block_goo"]
+        },
+        "blobblaster_block_sandy": {
+            "textures": ["textures/kkons/blocks/blobblaster/blobblaster_block_sandy"]
+        },
+        "blobblaster_block_virus": {
+            "textures": ["textures/kkons/blocks/blobblaster/blobblaster_block_virus.png"]
+        }
+    }
+}

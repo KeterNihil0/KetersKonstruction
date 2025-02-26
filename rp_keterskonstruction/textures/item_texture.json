@@ -4,6 +4,26 @@
     "texture_data": {
         "paletteknife": {
             "textures": ["textures/kkons/items/tools/paletteknife"]
+        },
+        "blobblaster": {
+            "textures": ["textures/kkons/items/tools/blobblaster/blobblaster_icon"]
+        },
+
+        "sandyslimeball": {
+            "textures": ["textures/kkons/items/materials/sandyslimeball"]
+        },
+
+        "blobblastercell_empty": {
+            "textures": ["textures/kkons/items/tools/blobblaster/cells/cell_empty"]
+        },
+        "blobblastercell_goo": {
+            "textures": ["textures/kkons/items/tools/blobblaster/cells/cell_goo"]
+        },
+        "blobblastercell_sandy": {
+            "textures": ["textures/kkons/items/tools/blobblaster/cells/cell_sandy"]
+        },
+        "blobblastercell_virus": {
+            "textures": ["textures/kkons/items/tools/blobblaster/cells/cell_virus"]
         }
     }
 }

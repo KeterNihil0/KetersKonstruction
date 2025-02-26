@@ -14,6 +14,18 @@
                 "kkons:paletteknife",
                 "kkons:blobblaster"
               ]
+            },
+            {
+              "group_identifier": {
+                "icon": "kkons:blobblastercell_goo",
+                "name": "kkons:blobblaster"
+              },
+              "items": [
+                "kkons:blobblastercell_empty",
+                "kkons:blobblastercell_goo",
+                "kkons:blobblastercell_sandy",
+                "kkons:blobblastercell_virus"
+              ]
             }
           ]
         }

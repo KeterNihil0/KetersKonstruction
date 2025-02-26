@@ -1,0 +1,18 @@
+{
+    "format_version": "1.21.60",
+    "minecraft:item": {
+        "description": {
+            "identifier": "kkons:blobblastercell_goo"
+        },
+        "components": {
+            "minecraft:icon": "blobblastercell_goo",
+            "minecraft:durability": {
+                "max_durability": 64
+            },
+            "minecraft:tags": {
+                "tags": ["kkons:cell_goo"]
+            },
+            "minecraft:allow_off_hand": true
+        }
+    }
+}
