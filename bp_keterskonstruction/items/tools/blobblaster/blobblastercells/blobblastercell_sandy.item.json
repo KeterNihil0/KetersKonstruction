@@ -1,0 +1,18 @@
+{
+    "format_version": "1.21.60",
+    "minecraft:item": {
+        "description": {
+            "identifier": "kkons:blobblastercell_sandy"
+        },
+        "components": {
+            "minecraft:icon": "blobblastercell_sandy",
+            "minecraft:durability": {
+                "max_durability": 64
+            },
+            "minecraft:tags": {
+                "tags": ["kkons:cell_sandy"]
+            },
+            "minecraft:allow_off_hand": true
+        }
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "kkons:blobblaster_se_sandy",
+            "materials": {
+                "outer": "slime_outer"
+            },
+            "textures": {
+                "default": "textures/kkons/blocks/blobblaster/blobblaster_block_sandy"
+            },
+            "geometry": {
+                "armor": "geometry.slime.armor"
+            },
+            "render_controllers": [
+                "controller.render.slime_armor"
+            ],
+            "animations": {
+                "move": "animation.arrow.move"
+            },
+            "scripts": {
+                "animate": [
+                    "move"
+                ]
+            }
+        }
+    }
+}
