@@ -4,23 +4,22 @@
         "description": {
             "identifier": "kkons:blobblaster_se_goo",
             "materials": {
-                "outer": "slime_outer"
+                "default": "snowball"
             },
             "textures": {
-                "default": "textures/kkons/blocks/blobblaster/blobblaster_block_goo"
+                "default": "textures/items/slimeball"
             },
             "geometry": {
-                "armor": "geometry.slime.armor"
+                "default": "geometry.item_sprite"
             },
-            "render_controllers": [
-                "controller.render.slime_armor"
-            ],
+            "render_controllers": [ "controller.render.item_sprite" ],
             "animations": {
-                "move": "animation.arrow.move"
+                "flying": "animation.actor.billboard"
             },
             "scripts": {
+                "scale": "(0.75)",
                 "animate": [
-                    "move"
+                    "flying"
                 ]
             }
         }

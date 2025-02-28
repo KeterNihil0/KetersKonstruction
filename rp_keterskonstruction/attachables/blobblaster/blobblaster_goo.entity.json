@@ -8,10 +8,10 @@
                 "enchanted": "entity_alphatest_glint"
             },
             "geometry": {
-                "default": "geometry.blobblaster"
+                "default": "geometry.blobblaster_v2"
             },
             "textures": {
-                "default": "textures/kkons/items/tools/blobblaster/blobblaster",
+                "default": "textures/kkons/items/tools/blobblaster/blobblaster_v2_goo",
                 "enchanted": "textures/misc/enchanted_item_glint"
             },
             "scripts": {
@@ -21,8 +21,8 @@
                 ]
             },
             "animations": {
-                "third_person":"animation.blobblaster.third_person",
-                "first_person":"animation.blobblaster.first_person"
+                "third_person":"animation.blobblaster_v2.third_person",
+                "first_person":"animation.blobblaster_v2.first_person"
             },
             "render_controllers": [
                 "controller.render.item_default"

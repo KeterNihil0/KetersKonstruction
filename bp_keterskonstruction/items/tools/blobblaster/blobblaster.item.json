@@ -3,7 +3,7 @@
     "minecraft:item": {
         "description": {
             "identifier": "kkons:blobblaster",
-            "is_experimental": true
+            "is_experimental": false
         },
         "components": {
             "minecraft:max_stack_size": 1,

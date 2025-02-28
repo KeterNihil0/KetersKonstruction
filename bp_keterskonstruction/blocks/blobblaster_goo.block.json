@@ -13,10 +13,7 @@
                 }
             },
             "minecraft:light_dampening": 0,
-            "minecraft:loot": "loot_tables/none.json",
-            "minecraft:custom_components": [
-                "kkons:goo_interact"
-            ]
+            "minecraft:loot": "loot_tables/none.json"
         }
     }
 }

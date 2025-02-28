@@ -16,7 +16,7 @@
             "minecraft:loot": "loot_tables/none.json",
             
             "minecraft:tick": {
-                "interval_range": [10,20]
+                "interval_range": [10,30]
             },
             "minecraft:custom_components": [
                 "kkons:goo_virus"

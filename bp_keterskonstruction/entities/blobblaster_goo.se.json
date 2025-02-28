@@ -17,6 +17,7 @@
             }
         },
         "components": {
+            "minecraft:type_family": {"family": ["kkons:goo"]},
             "minecraft:collision_box": {
                 "height": 0.5,
                 "width": 0.5
@@ -48,7 +49,9 @@
                     "stick_in_ground": {
                         "shake_time": 0.35
                     },
-                    "arrow_effect": {}
+                    "definition_event": {
+                        "event_trigger": "kkons:event_goo_collide"
+                    }
                 },
                 "particle": "iconcrack",
                 "potion_effect": -1,
@@ -56,7 +59,7 @@
                 "reflect_on_hurt": false,
                 "semi_random_diff_damage": false,
                 "shoot_sound": "",
-                "should_bounce": true
+                "should_bounce": false
             },
             "minecraft:damage_sensor": {
                 "triggers": [
@@ -65,6 +68,20 @@
                         "deals_damage": "no"
                     }
                 ]
+            }
+        },
+        "component_groups": {
+            "kkons:variant1": {
+                "minecraft:variant": {"value": 1}
+            }
+        },
+        "events": {
+            "kkons:entity_goo_collide": {
+                "add":{
+                    "component_groups": [
+                        "kkons:variant1"
+                    ]
+                }
             }
         }
     }
