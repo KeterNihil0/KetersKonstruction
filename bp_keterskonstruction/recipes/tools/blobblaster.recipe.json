@@ -1,0 +1,22 @@
+{
+    "format_version": "1.12.0",
+    "minecraft:recipe_shaped": {
+        "description": {
+            "identifier": "kkons:blobblaster"
+        },
+        "assume_symmetry": false,
+        "key": {
+            "I":{"item": "minecraft:iron_ingot"},
+            "D":{"item": "minecraft:dispenser"},
+            "C":{"item": "kkons:blobblaster_cell_empty"},
+            "L":{"item": "minecraft:lever"}
+        },
+        "pattern": [
+            "ICI",
+            " DL",
+            "II "
+        ],
+        "result":{"item":"kkons:blobblaster", "count": 1},
+        "tags": ["crafting_table"]
+    }
+}

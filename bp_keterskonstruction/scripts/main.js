@@ -78,12 +78,14 @@ const PaletteKnife = {
         }
     }
 };
-w.afterEvents.playerBreakBlock.subscribe((data) => {
+w.beforeEvents.playerBreakBlock.subscribe((data) => {
     let source = data.player;
-    let itemStack = data.itemStackBeforeBreak;
+    let itemStack = data.itemStack;
     let block = data.block;
-    if (itemStack.typeId.includes("kkons:blobblaster_") && !itemStack.typeId.includes("cell")) {
-        s.run(() => { gooSmoothV3(source.dimension, block.location, 4); });
+    if (itemStack != undefined) {
+        if (itemStack.typeId.includes("kkons:blobblaster_") && !itemStack.typeId.includes("cell")) {
+            s.run(() => { gooSmoothV3(source.dimension, block.location, 4); });
+        }
     }
 });
 w.afterEvents.itemStopUse.subscribe((data) => {
@@ -144,16 +146,16 @@ w.afterEvents.itemStartUse.subscribe((data) => {
                 if (itemstack.typeId != "kkons:blobblaster") {
                     if (durability.damage < durability.maxDurability) {
                         if (itemstack.hasTag("kkons:blaster_goo")) {
-                            oldAmmo = new ItemStack("kkons:blobblastercell_goo", 1);
+                            oldAmmo = new ItemStack("kkons:blobblaster_cell_goo", 1);
                         }
                         else if (itemstack.hasTag("kkons:blaster_sandy")) {
-                            oldAmmo = new ItemStack("kkons:blobblastercell_sandy", 1);
+                            oldAmmo = new ItemStack("kkons:blobblaster_cell_sandy", 1);
                         }
                         let oldAmmoDurability = oldAmmo.getComponent(ItemComponentTypes.Durability);
                         oldAmmoDurability.damage = durability.damage;
                     }
                     else {
-                        oldAmmo = new ItemStack("kkons:blobblastercell_empty", 1);
+                        oldAmmo = new ItemStack("kkons:blobblaster_cell_empty", 1);
                     }
                 }
                 //reload handler
@@ -210,7 +212,7 @@ w.beforeEvents.playerInteractWithBlock.subscribe((data) => {
     if (!equippable)
         return;
     const mainhand = equippable.getEquipmentSlot(EquipmentSlot.Mainhand);
-    if (mainhand.hasItem() && data.isFirstEvent && mainhand.typeId == "kkons:blobblastercell_virus" || mainhand.typeId == "kkons:blobblastercell_viralgoo") {
+    if (mainhand.hasItem() && data.isFirstEvent && mainhand.typeId == "kkons:blobblaster_cell_virus" || mainhand.typeId == "kkons:blobblaster_cell_viralgoo") {
         s.run(() => { gooVirus(block, source, mainhand); });
         data.cancel;
     }
@@ -251,6 +253,13 @@ s.runInterval(() => {
             }
             if (player.getDynamicProperty("kkons:blobblaster_charge") == undefined) {
                 player.setDynamicProperty("kkons:blobblaster_charge", 0);
+            }
+            if (+player.getDynamicProperty("kkons:blockblaster_charge") < 6 && player.hasTag("using_blockblaster")) {
+                player.setDynamicProperty("kkons:blockblaster_charge", +player.getDynamicProperty("kkons:blockblaster_charge") + 1);
+                player.runCommand(`titleraw @s actionbar {"rawtext":[{"text":"${Math.round((+player.getDynamicProperty("kkons:blockblaster_charge") / 6) * 100)}% charged"}]}`);
+            }
+            if (player.getDynamicProperty("kkons:blockblaster_charge") == undefined) {
+                player.setDynamicProperty("kkons:blockblaster_charge", 0);
             }
         }
         //Handles blob blaster projectiles, needs moving to a function
@@ -326,7 +335,7 @@ const GooInteract = {
 //    if (!equippable) return;
 //
 //    const mainhand = equippable.getEquipmentSlot(EquipmentSlot.Mainhand);
-//    if (!mainhand.hasItem() || mainhand.typeId != "kkons:blobblastercell_virus") {event.cancel; return;}
+//    if (!mainhand.hasItem() || mainhand.typeId != "kkons:blobblaster_cell_virus") {event.cancel; return;}
 //    {
 //        block.setType("kkons:blobblaster_block_virus");
 //
@@ -455,7 +464,7 @@ function* createBlobSphere(dim, loc, material, size) {
     }
 }
 function gooVirus(block, source, mainhand) {
-    if (mainhand.getItem().typeId == "kkons:blobblastercell_virus") {
+    if (mainhand.getItem().typeId == "kkons:blobblaster_cell_virus") {
         block.setType("kkons:blobblaster_block_virus");
     }
     else {
@@ -468,7 +477,7 @@ function gooVirus(block, source, mainhand) {
         else {
             mainhand.setItem(undefined);
         }
-        source.getComponent(EntityComponentTypes.Inventory).container?.addItem(new ItemStack("kkons:blobblastercell_empty"));
+        source.getComponent(EntityComponentTypes.Inventory).container?.addItem(new ItemStack("kkons:blobblaster_cell_empty"));
     }
 }
 //experimenting with gaussian smoothing on goo blocks

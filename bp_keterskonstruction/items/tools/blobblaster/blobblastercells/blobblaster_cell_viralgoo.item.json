@@ -2,7 +2,7 @@
     "format_version": "1.21.60",
     "minecraft:item": {
         "description": {
-            "identifier": "kkons:blobblastercell_viralgoo"
+            "identifier": "kkons:blobblaster_cell_viralgoo"
         },
         "components": {
             "minecraft:icon": "blobblastercell_viralgoo",

@@ -1,4 +1,4 @@
-import { Block, BlockComponentTickEvent, Dimension, Entity, EntityComponentTypes, EntityEquippableComponent, EntityInventoryComponent, EquipmentSlot, ItemComponentTypes, ItemDurabilityComponent, ItemStack, Player, system as s, Vector3, world as w } from "@minecraft/server";
+import { Block, BlockComponentTickEvent, Dimension, Entity, EntityComponentTypes, EntityEquippableComponent, EntityInventoryComponent, EquipmentSlot, ItemComponentTypes, ItemCooldownComponent, ItemDurabilityComponent, ItemStack, Player, system as s, Vector3, world as w } from "@minecraft/server";
 import { MathUtils } from "mathUtils";
 import { mcArray } from "mcArrays";
 
@@ -84,13 +84,15 @@ const PaletteKnife = {
     }
 };
 
-w.afterEvents.playerBreakBlock.subscribe((data) => {
+w.beforeEvents.playerBreakBlock.subscribe((data) => {
     let source = data.player;
-    let itemStack = data.itemStackBeforeBreak;
+    let itemStack = data.itemStack;
     let block = data.block;
 
+    if(itemStack!=undefined){
     if(itemStack.typeId.includes("kkons:blobblaster_") && !itemStack.typeId.includes("cell")) {
-        s.run(()=>{gooSmoothV3(source.dimension,block.location,4);});
+            s.run(()=>{gooSmoothV3(source.dimension,block.location,4);});
+        }
     }
 })
 
@@ -161,17 +163,17 @@ w.afterEvents.itemStartUse.subscribe((data)=> {
                 if (itemstack.typeId != "kkons:blobblaster") {
                     if (durability.damage < durability.maxDurability) {
                         if (itemstack.hasTag("kkons:blaster_goo")) {
-                            oldAmmo = new ItemStack("kkons:blobblastercell_goo", 1);
+                            oldAmmo = new ItemStack("kkons:blobblaster_cell_goo", 1);
 
                         } else if (itemstack.hasTag("kkons:blaster_sandy")) {
-                            oldAmmo = new ItemStack("kkons:blobblastercell_sandy", 1);
+                            oldAmmo = new ItemStack("kkons:blobblaster_cell_sandy", 1);
                         }
 
                         let oldAmmoDurability = oldAmmo.getComponent(ItemComponentTypes.Durability) as ItemDurabilityComponent
                         oldAmmoDurability.damage = durability.damage;
 
                     } else {
-                        oldAmmo = new ItemStack("kkons:blobblastercell_empty", 1);
+                        oldAmmo = new ItemStack("kkons:blobblaster_cell_empty", 1);
                     }
                 }
 
@@ -226,7 +228,7 @@ w.beforeEvents.playerInteractWithBlock.subscribe((data)=> {
     if (!equippable) return;
 
     const mainhand = equippable.getEquipmentSlot(EquipmentSlot.Mainhand);
-    if (mainhand.hasItem() && data.isFirstEvent && mainhand.typeId == "kkons:blobblastercell_virus" || mainhand.typeId == "kkons:blobblastercell_viralgoo") 
+    if (mainhand.hasItem() && data.isFirstEvent && mainhand.typeId == "kkons:blobblaster_cell_virus" || mainhand.typeId == "kkons:blobblaster_cell_viralgoo") 
     {
         s.run(()=> {gooVirus(block,source,mainhand);});
         data.cancel;
@@ -275,6 +277,14 @@ s.runInterval(() => {
             } 
             if (player.getDynamicProperty("kkons:blobblaster_charge") == undefined) { 
                 player.setDynamicProperty("kkons:blobblaster_charge", 0) 
+            }
+
+            if(+player.getDynamicProperty("kkons:blockblaster_charge") < 6 && player.hasTag("using_blockblaster")) {
+                player.setDynamicProperty("kkons:blockblaster_charge", +player.getDynamicProperty("kkons:blockblaster_charge") + 1);
+                player.runCommand(`titleraw @s actionbar {"rawtext":[{"text":"${Math.round((+player.getDynamicProperty("kkons:blockblaster_charge")/6)*100)}% charged"}]}`)
+            } 
+            if (player.getDynamicProperty("kkons:blockblaster_charge") == undefined) { 
+                player.setDynamicProperty("kkons:blockblaster_charge", 0) 
             }
         }
 
@@ -368,7 +378,7 @@ const GooInteract = {
     //    if (!equippable) return;
 //
     //    const mainhand = equippable.getEquipmentSlot(EquipmentSlot.Mainhand);
-    //    if (!mainhand.hasItem() || mainhand.typeId != "kkons:blobblastercell_virus") {event.cancel; return;}
+    //    if (!mainhand.hasItem() || mainhand.typeId != "kkons:blobblaster_cell_virus") {event.cancel; return;}
     //    {
     //        block.setType("kkons:blobblaster_block_virus");
 //
@@ -511,13 +521,13 @@ function* createBlobSphere(dim : Dimension, loc : Vector3, material : string, si
 
 function gooVirus(block : Block, source : Player, mainhand) {
 
-    if (mainhand.getItem().typeId == "kkons:blobblastercell_virus") {block.setType("kkons:blobblaster_block_virus");}
+    if (mainhand.getItem().typeId == "kkons:blobblaster_cell_virus") {block.setType("kkons:blobblaster_block_virus");}
     else {block.setType("kkons:blobblaster_block_viralgoo");}
 
     if (source.getGameMode() != 'creative') {
         if (mainhand.amount > 1) {mainhand.amount--;}
         else {mainhand.setItem(undefined);}
-        (source.getComponent(EntityComponentTypes.Inventory) as EntityInventoryComponent).container?.addItem(new ItemStack("kkons:blobblastercell_empty"));
+        (source.getComponent(EntityComponentTypes.Inventory) as EntityInventoryComponent).container?.addItem(new ItemStack("kkons:blobblaster_cell_empty"));
     }
 }
 
