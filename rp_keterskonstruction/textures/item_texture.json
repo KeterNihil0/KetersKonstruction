@@ -8,10 +8,14 @@
         "blobblaster": {
             "textures": ["textures/kkons/items/tools/blobblaster/blobblaster_icon"]
         },
+        "blockblaster": {
+            "textures": ["textures/kkons/items/tools/blockblaster/blockblaster_icon"]
+        },
 
         "sandyslimeball": {
             "textures": ["textures/kkons/items/materials/sandyslimeball"]
         },
+
 
         "blobblastercell_empty": {
             "textures": ["textures/kkons/items/tools/blobblaster/cells/cell_empty"]
@@ -24,6 +28,9 @@
         },
         "blobblastercell_virus": {
             "textures": ["textures/kkons/items/tools/blobblaster/cells/cell_virus"]
+        },
+        "blobblastercell_viralgoo": {
+            "textures": ["textures/kkons/items/tools/blobblaster/cells/cell_viralgoo"]
         }
     }
 }

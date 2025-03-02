@@ -84,44 +84,61 @@ const PaletteKnife = {
     }
 };
 
+w.afterEvents.playerBreakBlock.subscribe((data) => {
+    let source = data.player;
+    let itemStack = data.itemStackBeforeBreak;
+    let block = data.block;
+
+    if(itemStack.typeId.includes("kkons:blobblaster_") && !itemStack.typeId.includes("cell")) {
+        s.run(()=>{gooSmoothV3(source.dimension,block.location,4);});
+    }
+})
+
 w.afterEvents.itemStopUse.subscribe((data)=> {
     
     //will attempt to remove any "Using" tags from the player
     const source = data.source;
     if (source.hasTag("using_blobblaster")) {
-    try {
-        source.removeTag("using_blobblaster");
-        source.runCommand(`say Charge is ${source.getDynamicProperty("kkons:blaster_charge")}`)
-        if(+source.getDynamicProperty("kkons:blaster_charge") > 0) {
-            blobBlasterShoot(source);
-            source.setDynamicProperty("kkons:blaster_charge", 0);
+        try {
+            source.removeTag("using_blobblaster");
+            if(+source.getDynamicProperty("kkons:blobblaster_charge") > 0) {
+                blobBlasterShoot(source);
+                source.setDynamicProperty("kkons:blobblaster_charge", 0);
+                //console.log(`Blobblaster should fire \n player blobblaster count is now ${JSON.stringify(source.getDynamicProperty("kkons:blobblaster_charge"))}`)
+            }
+        } catch (error) {
+
         }
-    } catch (error) {
-        
-    }}
+    } 
+
+    if (source.hasTag("using_blockblaster")) {
+        try {
+            source.removeTag("using_blockblaster");
+            if(+source.getDynamicProperty("kkons:blockblaster_charge") > 0) {
+                source.setDynamicProperty("kkons:blockblaster_charge", 0);
+            }
+        } catch (error) {
+
+        }
+    } 
 })
 
 w.afterEvents.itemUse.subscribe((data)=> {
     const source = data.source;
     let itemstack = data.itemStack;
-    source.runCommand(`say player using?`);
  
-    if (itemstack.typeId.includes("kkons:blobblaster") && !itemstack.typeId.includes("cell")) {
-        source.runCommand(`say player using???`);
+    if (itemstack.typeId.includes("kkons:blobblaster") && !itemstack.typeId.includes("cell") && itemstack.typeId != "kkons:blobblaster" && !source.isSneaking) {
+        //source.runCommand(`say player using Blobblaster`);
+        try {
+            source.addTag("using_blobblaster");
+        } catch (error) {}
+    }
 
-        //change blaster ammo
-        if (!source.isSneaking) {
-
-            //will attempt to attach "using" tags to the player
-            if (itemstack.typeId != "kkons:blobblaster") {
-                try {
-                    source.addTag("using_blobblaster");
-                    
-                } catch (error) {
-
-                }
-            }
-        }
+    if (itemstack.typeId.includes("kkons:blockblaster") && !source.isSneaking) {
+        //source.runCommand(`say player using Blockblaster`);
+        try {
+            source.addTag("using_blockblaster");
+        } catch (error) {}
     }
 })
 
@@ -201,8 +218,6 @@ w.beforeEvents.playerInteractWithBlock.subscribe((data)=> {
 
     if(!source) {return;}
 
-    if(data.itemStack?.typeId.includes("apple"))s.run(()=>{gooSmooth(source.dimension, block.location, 5)});
-
     if(!block.typeId.includes("kkons:blobblaster")) {data.cancel; return;}
 
     if(source.isSneaking) {data.cancel; return;}
@@ -211,16 +226,17 @@ w.beforeEvents.playerInteractWithBlock.subscribe((data)=> {
     if (!equippable) return;
 
     const mainhand = equippable.getEquipmentSlot(EquipmentSlot.Mainhand);
-    if (!mainhand.hasItem() || mainhand.typeId != "kkons:blobblastercell") {data.cancel; return;}
+    if (mainhand.hasItem() && data.isFirstEvent && mainhand.typeId == "kkons:blobblastercell_virus" || mainhand.typeId == "kkons:blobblastercell_viralgoo") 
     {
-        s.run(()=> {gooVirus(block,source,mainhand);})
+        s.run(()=> {gooVirus(block,source,mainhand);});
+        data.cancel;
     }
 })
 
-w.afterEvents.dataDrivenEntityTrigger.subscribe((data) => {
-    s.run(()=>{data.entity.runCommand(`say collided!`)})
-    if (data.eventId.includes("kkons:event_goo_collide") && data.entity.typeId.includes("kkons:blobblaster")) {
-        s.run(()=>{gooHandler(data.entity)})
+w.afterEvents.projectileHitBlock.subscribe((data) => {
+    let projectile = data.projectile;
+    if (projectile.typeId.includes("kkons:blobblaster")) {
+        s.run(()=>{gooHandlerV2(projectile)});
     }
 })
 
@@ -230,7 +246,7 @@ w.beforeEvents.chatSend.subscribe((data) => {
 
     if(message.includes(".smooth")) {
 
-        s.run(()=> {gooSmooth(source.dimension, source.location, 5);})
+        s.run(()=> {gooSmoothV3(source.dimension, source.location, 5);})
         message.substring(".smooth ".length)
     }
 })
@@ -253,12 +269,12 @@ s.runInterval(() => {
         if(heldItem?.hasTag("kkons:blaster") && blasterUpdateTick == 2) {
             //player.runCommand(`playanimation @s animation.kkons_player.blaster_heavy root 0.00001 "!query.equipped_item_any_tag('slot.weapon.mainhand', 'kkons:blaster')"`);
             player.playAnimation("animation.kkons_player.blaster_heavy", {nextState:"root", stopExpression:"!query.equipped_item_any_tag('slot.weapon.mainhand', 'kkons:blaster')"});
-            if(+player.getDynamicProperty("kkons:blaster_charge") < 6 && player.hasTag("using_blobblaster")) {
-                player.setDynamicProperty("kkons:blaster_charge", +player.getDynamicProperty("kkons:blaster_charge") + 1);
-                player.runCommand(`titleraw @s actionbar {"rawtext":[{"text":"${Math.round((+player.getDynamicProperty("kkons:blaster_charge")/6)*100)}% charged"}]}`)
+            if(+player.getDynamicProperty("kkons:blobblaster_charge") < 6 && player.hasTag("using_blobblaster")) {
+                player.setDynamicProperty("kkons:blobblaster_charge", +player.getDynamicProperty("kkons:blobblaster_charge") + 1);
+                player.runCommand(`titleraw @s actionbar {"rawtext":[{"text":"${Math.round((+player.getDynamicProperty("kkons:blobblaster_charge")/6)*100)}% charged"}]}`)
             } 
-            if (player.getDynamicProperty("kkons:blaster_charge") == undefined) { 
-                player.setDynamicProperty("kkons:blaster_charge", 0) 
+            if (player.getDynamicProperty("kkons:blobblaster_charge") == undefined) { 
+                player.setDynamicProperty("kkons:blobblaster_charge", 0) 
             }
         }
 
@@ -293,11 +309,12 @@ s.runInterval(() => {
 
     //handles blobblaster goo, need to add variants maybe run a function with variants parameters?
 
-    if(true==true) {
-        w.getDimension("overworld").getEntities({families:["kkons:goo"]}).forEach(goo => {
-            gooHandler(goo);
-        });
-    }
+    //now handled with projectile hit
+    //if(true==true) {
+    //    w.getDimension("overworld").getEntities({families:["kkons:goo"]}).forEach(goo => {
+    //        gooHandler(goo);
+    //    });
+    //}
 },4)
 
 
@@ -319,12 +336,22 @@ const GooVirus = {
         const dimension = event.dimension;
         const bl = block.location
 
-        dimension.runCommand(`fill ${bl.x - 1} ${bl.y - 1} ${bl.z - 1} ${bl.x + 1} ${bl.y + 1} ${bl.z + 1} kkons:blobblaster_block_virus replace kkons:blobblaster_block_goo`);
-        dimension.runCommand(`fill ${bl.x - 1} ${bl.y - 1} ${bl.z - 1} ${bl.x + 1} ${bl.y + 1} ${bl.z + 1} kkons:blobblaster_block_virus replace kkons:blobblaster_block_sandy`);
         dimension.runCommand(`playsound mob.player.hurt_on_fire @a ${bl.x} ${bl.y} ${bl.z} 0.2 0.7`);
         dimension.spawnParticle('minecraft:basic_smoke_particle', bl)
-        //dimension.runCommand(`particle minecraft:water_evaporation_bucket_emitter ${bl.x} ${bl.y} ${bl.z}`)
-        block.setType("minecraft:air");
+
+        if(block.typeId == "kkons:blobblaster_block_virus") {
+
+            dimension.runCommand(`fill ${bl.x - 1} ${bl.y - 1} ${bl.z - 1} ${bl.x + 1} ${bl.y + 1} ${bl.z + 1} kkons:blobblaster_block_virus replace kkons:blobblaster_block_goo`);
+            dimension.runCommand(`fill ${bl.x - 1} ${bl.y - 1} ${bl.z - 1} ${bl.x + 1} ${bl.y + 1} ${bl.z + 1} kkons:blobblaster_block_virus replace kkons:blobblaster_block_sandy`);
+            //dimension.runCommand(`particle minecraft:water_evaporation_bucket_emitter ${bl.x} ${bl.y} ${bl.z}`)
+            block.setType("minecraft:air");
+
+        } else {
+
+            dimension.runCommand(`fill ${bl.x - 1} ${bl.y - 1} ${bl.z - 1} ${bl.x + 1} ${bl.y + 1} ${bl.z + 1} kkons:blobblaster_block_viralgoo replace kkons:blobblaster_block_sandy`);
+            //dimension.runCommand(`particle minecraft:water_evaporation_bucket_emitter ${bl.x} ${bl.y} ${bl.z}`)
+            block.setType("kkons:blobblaster_block_goo");
+        }
     }
 }
 
@@ -388,7 +415,7 @@ function blobBlasterShoot(player : Player) {
 
     if ((durability.damage < durability.maxDurability || player.getGameMode() == 'creative') && blasterAmmo != "none") {
 
-        const charge = +player.getDynamicProperty("kkons:blaster_charge")
+        const charge = +player.getDynamicProperty("kkons:blobblaster_charge")
         //need to add other goo variants
         let projectile = player.dimension.spawnEntity(blasterAmmo,MathUtils.addVectors(player.location,{x:0,y:1.6,z:0}));
         player.runCommand(`playsound fall.slime @a ${player.location.x} ${player.location.y} ${player.location.z} 0.5`);
@@ -437,6 +464,36 @@ function gooHandler(goo : Entity) {
     }
 }
 
+//updating to use projectile hit detection, should improve game speed 
+function gooHandlerV2(goo : Entity) {
+    let block : string = undefined;
+    switch (goo.typeId) {
+        case "kkons:blobblaster_se_goo":
+            block = "kkons:blobblaster_block_goo";
+        break;
+        case "kkons:blobblaster_se_sandy":
+            block = "kkons:blobblaster_block_sandy";
+        break;
+        default:
+        break;
+    }
+
+    //prevents immediately turning solid on player
+    {   
+        if(!goo.getProperty("kkons:falling") || block != "kkons:blobblaster_block_sandy") {
+
+            //fills local area with solid "goo"
+            s.runJob(createBlobSphere(goo.dimension, goo.location, block, +goo.getDynamicProperty("kkons:goo_charge")));
+            goo.remove();
+        } else if(mcArray.canReplace(goo.dimension.getBlock(goo.location).typeId)&&(!mcArray.canReplace(goo.dimension.getBlock(goo.location).below(1).typeId))) {
+            goo.dimension.getBlock(goo.location).setType(block);
+            goo.remove();
+        } else if(!mcArray.canReplace(goo.dimension.getBlock(goo.location).typeId)) {
+            goo.remove();
+        }
+    }
+}
+
 function* createBlobSphere(dim : Dimension, loc : Vector3, material : string, size : number) {
     for (let x = -size; x < size; x++) {
         for (let y = -size; y < size; y++) {
@@ -453,7 +510,9 @@ function* createBlobSphere(dim : Dimension, loc : Vector3, material : string, si
 }
 
 function gooVirus(block : Block, source : Player, mainhand) {
-    block.setType("kkons:blobblaster_block_virus");
+
+    if (mainhand.getItem().typeId == "kkons:blobblastercell_virus") {block.setType("kkons:blobblaster_block_virus");}
+    else {block.setType("kkons:blobblaster_block_viralgoo");}
 
     if (source.getGameMode() != 'creative') {
         if (mainhand.amount > 1) {mainhand.amount--;}
@@ -464,10 +523,15 @@ function gooVirus(block : Block, source : Player, mainhand) {
 
 
 //experimenting with gaussian smoothing on goo blocks
-function gooSmooth(dim : Dimension, origin : Vector3, r : number) {
+////reduce dim.getBlock() calls by only accessing the block array unless needed to do otherwise
+////instead of using an array, try and use a map?
+////also, use a sample radius larger than the smoothing radius to try and blend better into surrounding neighbours that aren't smoothed
+async function gooSmooth(dim : Dimension, origin : Vector3, r : number) {
     
     //get blocks and their locations within a radius around origin
     let blocks = [];
+    let blockMap = new Map<string, { b: Block; v3: Vector3; nV3: Vector3; typeId: string; dist: number }>();
+
     for (let x = -r; x < r; x++) {
         for (let y = -r; y < r; y++) {
             for (let z = -r; z < r; z++) {
@@ -478,6 +542,7 @@ function gooSmooth(dim : Dimension, origin : Vector3, r : number) {
                     if (block.isValid && block != undefined && !(block.isAir||block.isLiquid)) {
                         if (block.typeId.includes("kkons:blobblaster")) {
                             blocks.push({b:block,v3:block.location,nV3:block.location,typeId:block.typeId,dist:dist});
+                            blockMap.set(`${dLoc.x},${dLoc.y},${dLoc.z}`, {b:block,v3:block.location,nV3:block.location,typeId:block.typeId,dist:dist})
                         }
                     }
                 }
@@ -553,6 +618,181 @@ function gooSmooth(dim : Dimension, origin : Vector3, r : number) {
     });
 }
 
+//potentially refined gaussian smooth? needs testing
+function gooSmoothV2(dim: Dimension, origin: Vector3, r: number) {
+    let blocks = new Map<string, { b: Block; v3: Vector3; nV3: Vector3; typeId: string; dist: number }>();
+
+    // Collect relevant blocks
+    for (let x = -r; x <= r; x++) {
+        for (let y = -r; y <= r; y++) {
+            for (let z = -r; z <= r; z++) {
+                let dLoc = { x: origin.x + x, y: origin.y + y, z: origin.z + z };
+                let dist = MathUtils.dist(dLoc, origin);
+                
+                if (dist <= r) {
+                    const block = dim.getBlock(dLoc);
+                    if (block?.isValid && !block.isAir && !block.isLiquid && block.typeId.includes("kkons:blobblaster")) {
+                        blocks.set(`${dLoc.x},${dLoc.y},${dLoc.z}`, { b: block, v3: dLoc, nV3: dLoc, typeId: block.typeId, dist });
+                    }
+                }
+            }
+        }
+    }
+
+    // Compute new positions
+    blocks.forEach(bD => {
+        let sumV3 = { x: 0, y: 0, z: 0 };
+        let neighbors = 0;
+
+        for (let x = -2; x <= 2; x++) {
+            for (let y = -2; y <= 2; y++) {
+                for (let z = -2; z <= 2; z++) {
+                    let offset = { x: x, y: y, z: z };
+                    let dV3 = MathUtils.addVectors(bD.v3, offset);
+                    let dist = bD.dist * 0.75;
+                    if (dist < 1) dist = 1;
+
+                    if (blocks.has(`${dV3.x},${dV3.y},${dV3.z}`)) {
+                        sumV3.x += x / dist;
+                        sumV3.y += y / dist;
+                        sumV3.z += z / dist;
+                        neighbors++;
+                    }
+                }
+            }
+        }
+
+        if (neighbors > 0) {
+            bD.nV3 = {
+                x: Math.round(bD.v3.x + sumV3.x / neighbors),
+                y: Math.round(bD.v3.y + sumV3.y / neighbors),
+                z: Math.round(bD.v3.z + sumV3.z / neighbors),
+            };
+        }
+    });
+
+    // Move blocks efficiently
+    let movedBlocks = new Map<string, string>();
+
+    blocks.forEach(bD => {
+        if (bD.v3 !== bD.nV3) {
+            movedBlocks.set(`${bD.v3.x},${bD.v3.y},${bD.v3.z}`, "minecraft:air");
+            movedBlocks.set(`${bD.nV3.x},${bD.nV3.y},${bD.nV3.z}`, bD.typeId);
+        }
+    });
+
+    blocks.forEach(bD => {
+        if (bD.v3 !== bD.nV3) {
+            movedBlocks.set(`${bD.nV3.x},${bD.nV3.y},${bD.nV3.z}`, bD.typeId);
+        }
+    });
+
+    movedBlocks.forEach((typeId, pos) => {
+        let [x, y, z] = pos.split(",").map(Number);
+        dim.getBlock({ x, y, z })?.setType(typeId);
+    });
+}
+
+//applying refinements to gooSmooth
+async function gooSmoothV3(dim : Dimension, o : Vector3, r : number) {
+
+    const r2 = r+1;
+
+    const origin = { x: Math.round(o.x), y: Math.round(o.y), z:Math.round(o.z)};
+    
+    //get blocks and their locations within a radius around origin
+    let blocks = [];
+    let blockMap = new Map<string, { b: Block; v3: Vector3; nV3: Vector3; typeId: string; dist: number }>();
+
+    for (let x = -r; x < r; x++) {
+        for (let y = -r; y < r; y++) {
+            for (let z = -r; z < r; z++) {
+                let dLoc = {x:origin.x+x, y:origin.y+y, z:origin.z+z}
+                let dist = MathUtils.dist(dLoc,origin);
+                if (dist<=r) {
+                    const block = dim.getBlock(dLoc);
+                    if (block.isValid && block != undefined && !(block.isAir||block.isLiquid)) {
+                        if (block.typeId.includes("kkons:blobblaster")) {
+                            blocks.push({b:block,v3:block.location,nV3:block.location,typeId:block.typeId,dist:dist});
+                            blockMap.set(`${dLoc.x},${dLoc.y},${dLoc.z}`, {b:block,v3:block.location,nV3:block.location,typeId:block.typeId,dist:dist})
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //console.log(`found ${blockMap.size} blocks`)
+
+    //for each block, calc the "weight" for gaussian smooth using neighbours
+    blockMap.forEach(bD => {
+
+
+        //get neighbour vectors
+        let v3 = bD.v3;
+        let nV3 = bD.nV3;
+        let sumV3 = {x:0,y:0,z:0};
+        let neighbours = 0;
+        for (let x = -2; x < 2; x++) {
+            for (let y = -2; y < 2; y++) {
+                for (let z = -2; z < 2; z++) {
+                    const offset = {x:x, y:y, z:z}
+                    let dV3 = MathUtils.addVectors(v3,offset); 
+                    let dist = bD.dist
+                    //MathUtils.dist(v3,dV3);
+                    //let neighbour = dim.getBlock(dV3);
+                    dist*=0.75;
+                    if (dist<1) dist=1;
+                    if (blockMap.has(`${dV3.x},${dV3.y},${dV3.z}`)){
+                        //adds the vectors
+                        ///should become less prominent with distance
+                        sumV3.x+=(x/dist);
+                        sumV3.y+=(y/dist);
+                        sumV3.z+=(z/dist);
+                        neighbours++;
+                        //console.log(`found block to push`)
+                    }
+                }
+            }
+        }
+
+        //get the weight vector3 for where to move the block
+        if (neighbours>0) {
+            let avgV3 : Vector3 = {x:0,y:0,z:0};
+            avgV3.x = Math.round(sumV3.x/neighbours);
+            avgV3.y = Math.round(sumV3.y/neighbours);
+            avgV3.z = Math.round(sumV3.z/neighbours);
+            
+            nV3 = MathUtils.addVectors(v3,avgV3);
+
+            bD.nV3 = nV3;
+        }
+    });
+
+    //now that each block has a weight, "push" the block to that new spot
+
+    
+    blockMap.forEach(bD => {
+        let oldPosition : Vector3 = bD.v3;
+        let newPosition : Vector3 = bD.nV3;
+
+        if(!MathUtils.vectorsMatch(oldPosition,newPosition)) {
+
+            dim.getBlock(oldPosition).setType("minecraft:air");
+            //console.log(`modifying block at \n${JSON.stringify(oldPosition)} to \n${JSON.stringify(newPosition)}}`)
+        }
+    });
+
+    blockMap.forEach(bD => {
+        let oldPosition : Vector3 = bD.v3;
+        let newPosition : Vector3 = bD.nV3;
+
+        if(!MathUtils.vectorsMatch(oldPosition,newPosition) && (mcArray.canReplace(dim.getBlock(newPosition).typeId))) {
+
+        dim.getBlock(newPosition).setType(bD.typeId);
+        }
+    });
+}
 
 //util
 const entityOffset = {x:0.5,y:0.5,z:0.5}

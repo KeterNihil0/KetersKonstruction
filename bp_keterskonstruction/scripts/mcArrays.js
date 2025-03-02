@@ -32,5 +32,7 @@ mcArray.replaceable = [
     "minecraft:cobweb",
     "minecraft:vine",
     "minecraft:lily_pad",
-    "minecraft:sweet_berry_bush"
+    "minecraft:sweet_berry_bush",
+    "minecraft:blobblaster_block_goo",
+    "minecraft:blobblaster_block_sandy"
 ];

@@ -12,7 +12,8 @@
               },
               "items": [
                 "kkons:paletteknife",
-                "kkons:blobblaster"
+                "kkons:blobblaster",
+                "kkons:blockblaster"
               ]
             },
             {
@@ -24,7 +25,8 @@
                 "kkons:blobblastercell_empty",
                 "kkons:blobblastercell_goo",
                 "kkons:blobblastercell_sandy",
-                "kkons:blobblastercell_virus"
+                "kkons:blobblastercell_virus",
+                "kkons:blobblastercell_viralgoo"
               ]
             }
           ]

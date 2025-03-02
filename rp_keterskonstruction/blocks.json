@@ -11,5 +11,9 @@
     "kkons:blobblaster_block_virus": {
         "textures": "blobblaster_block_virus",
         "sound": "slime"
+    },
+    "kkons:blobblaster_block_viralgoo": {
+        "textures": "blobblaster_block_goo",
+        "sound": "slime"
     }
 }

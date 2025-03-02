@@ -33,4 +33,22 @@ export class MathUtils {
         dist = Math.sqrt((dx * dx) + (dy * dy) + (dz * dz));
         return dist;
     }
+    static vectorsMatch(x1, y1, z1, x2, y2, z2) {
+        if (x1.x == undefined) {
+            if (x1 == x2 && y1 == y2 && z1 == z2) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            if (x1.x == y1.x && x1.y == y1.y && x1.z == y1.z) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
 }

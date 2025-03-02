@@ -17,7 +17,7 @@
 				"max_particles": 100
 			},
 			"minecraft:emitter_lifetime_looping": {
-				"active_time": 1
+				"active_time": 2
 			},
 			"minecraft:emitter_shape_point": {
 				"offset": ["math.random(-0.25,0.25)", "math.random(-0.25,0.25)", "math.random(-0.25,0.25)"]
@@ -27,7 +27,7 @@
 			},
 			"minecraft:particle_initial_speed": 0,
 			"minecraft:particle_motion_dynamic": {
-				"linear_acceleration": ["(variable.particle_random_3-0.5)", -1, "(variable.particle_random_4-0.5)"],
+				"linear_acceleration": ["(variable.particle_random_3-0.5)", -4, "(variable.particle_random_4-0.5)"],
 				"linear_drag_coefficient": 0.2
 			},
 			"minecraft:particle_appearance_billboard": {
@@ -39,6 +39,10 @@
 					"uv": ["(v.particle_random_1>=0.5) ? -8 : 8", "(v.particle_random_2>=0.5) ? -8 : 8"],
 					"uv_size": [16, 16]
 				}
+			},
+			"minecraft:particle_motion_collision": {
+				"collision_drag": 0.2,
+				"collision_radius": 0.2
 			},
 			"minecraft:particle_appearance_tinting": {
 				"color": [1, 1, 1, 1]
