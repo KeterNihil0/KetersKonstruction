@@ -1,6 +1,18 @@
-import { Block, BlockVolumeBase, Dimension, DimensionType, Entity, EntityComponentTypes, EntityEquippableComponent, EntityInventoryComponent, EquipmentSlot, ItemComponentTypes, ItemDurabilityComponent, ItemStack, Player, system as s, Vector3, world as w } from "@minecraft/server";
+import { Block, BlockComponentTickEvent, Dimension, Entity, EntityComponentTypes, EntityEquippableComponent, EntityInventoryComponent, EquipmentSlot, ItemComponentTypes, ItemDurabilityComponent, ItemStack, Player, system as s, Vector3, world as w } from "@minecraft/server";
 import { MathUtils } from "mathUtils";
 import { mcArray } from "mcArrays";
+
+w.beforeEvents.worldInitialize.subscribe(({ itemComponentRegistry }) => {
+    itemComponentRegistry.registerCustomComponent('kkons:paletteknife', PaletteKnife);
+    itemComponentRegistry.registerCustomComponent('kkons:blobblaster', BlobBlaster);
+});
+
+//w.beforeEvents.worldInitialize
+w.beforeEvents.worldInitialize.subscribe(({ blockComponentRegistry }) => {
+    blockComponentRegistry.registerCustomComponent('kkons:goo_virus', GooVirus);
+    blockComponentRegistry.registerCustomComponent('kkons:gravity_block', GravityBlock);
+});
+
 
 const PaletteKnife = {
     onUseOn(event) {
@@ -62,7 +74,7 @@ const PaletteKnife = {
                     let playerItem = new ItemStack(playerCont.getItem(pi[rand]).typeId, playerCont.getItem(pi[rand]).amount);
                     if(source.getGameMode() == "survival") {
                         if(playerItem.amount-1!=0) {playerItem.amount-=1; playerCont.setItem(pi[rand],playerItem);}
-                        else {source.runCommandAsync(`replaceitem entity @s slot.hotbar ${pi[rand]} air`)}
+                        else {source.runCommand(`replaceitem entity @s slot.hotbar ${pi[rand]} air`)}
                     }
                 } catch (error) {
                     
@@ -76,18 +88,26 @@ w.afterEvents.itemStopUse.subscribe((data)=> {
     
     //will attempt to remove any "Using" tags from the player
     const source = data.source;
+    if (source.hasTag("using_blobblaster")) {
     try {
         source.removeTag("using_blobblaster");
+        source.runCommand(`say Charge is ${source.getDynamicProperty("kkons:blaster_charge")}`)
+        if(+source.getDynamicProperty("kkons:blaster_charge") > 0) {
+            blobBlasterShoot(source);
+            source.setDynamicProperty("kkons:blaster_charge", 0);
+        }
     } catch (error) {
         
-    }
+    }}
 })
 
 w.afterEvents.itemUse.subscribe((data)=> {
     const source = data.source;
     let itemstack = data.itemStack;
+    source.runCommand(`say player using?`);
  
     if (itemstack.typeId.includes("kkons:blobblaster") && !itemstack.typeId.includes("cell")) {
+        source.runCommand(`say player using???`);
 
         //change blaster ammo
         if (!source.isSneaking) {
@@ -96,6 +116,7 @@ w.afterEvents.itemUse.subscribe((data)=> {
             if (itemstack.typeId != "kkons:blobblaster") {
                 try {
                     source.addTag("using_blobblaster");
+                    
                 } catch (error) {
 
                 }
@@ -180,6 +201,8 @@ w.beforeEvents.playerInteractWithBlock.subscribe((data)=> {
 
     if(!source) {return;}
 
+    if(data.itemStack?.typeId.includes("apple"))s.run(()=>{gooSmooth(source.dimension, block.location, 5)});
+
     if(!block.typeId.includes("kkons:blobblaster")) {data.cancel; return;}
 
     if(source.isSneaking) {data.cancel; return;}
@@ -188,7 +211,7 @@ w.beforeEvents.playerInteractWithBlock.subscribe((data)=> {
     if (!equippable) return;
 
     const mainhand = equippable.getEquipmentSlot(EquipmentSlot.Mainhand);
-    if (!mainhand.hasItem() || mainhand.typeId != "kkons:blobblastercell_virus") {data.cancel; return;}
+    if (!mainhand.hasItem() || mainhand.typeId != "kkons:blobblastercell") {data.cancel; return;}
     {
         s.run(()=> {gooVirus(block,source,mainhand);})
     }
@@ -200,6 +223,18 @@ w.afterEvents.dataDrivenEntityTrigger.subscribe((data) => {
         s.run(()=>{gooHandler(data.entity)})
     }
 })
+
+w.beforeEvents.chatSend.subscribe((data) => {
+    const message = data.message;
+    const source = data.sender;
+
+    if(message.includes(".smooth")) {
+
+        s.run(()=> {gooSmooth(source.dimension, source.location, 5);})
+        message.substring(".smooth ".length)
+    }
+})
+
 
 let tickCount = 0;
 let blasterUpdateTick = 0;
@@ -215,14 +250,21 @@ s.runInterval(() => {
         let playerInv = player.getComponent('minecraft:inventory') as EntityInventoryComponent;
         let playerCont = playerInv.container;
         let heldItem = playerCont.getItem(player.selectedSlotIndex) as ItemStack;
-        if(heldItem?.hasTag("kkons:blaster")) {
-            //player.runCommandAsync(`playanimation @s animation.kkons_player.blaster_heavy root 0.00001 "!query.equipped_item_any_tag('slot.weapon.mainhand', 'kkons:blaster')"`);
-            player.playAnimation("animation.kkons_player.blaster_heavy", {nextState:"root", stopExpression:"!query.equipped_item_any_tag('slot.weapon.mainhand', 'kkons:blaster')"})
+        if(heldItem?.hasTag("kkons:blaster") && blasterUpdateTick == 2) {
+            //player.runCommand(`playanimation @s animation.kkons_player.blaster_heavy root 0.00001 "!query.equipped_item_any_tag('slot.weapon.mainhand', 'kkons:blaster')"`);
+            player.playAnimation("animation.kkons_player.blaster_heavy", {nextState:"root", stopExpression:"!query.equipped_item_any_tag('slot.weapon.mainhand', 'kkons:blaster')"});
+            if(+player.getDynamicProperty("kkons:blaster_charge") < 6 && player.hasTag("using_blobblaster")) {
+                player.setDynamicProperty("kkons:blaster_charge", +player.getDynamicProperty("kkons:blaster_charge") + 1);
+                player.runCommand(`titleraw @s actionbar {"rawtext":[{"text":"${Math.round((+player.getDynamicProperty("kkons:blaster_charge")/6)*100)}% charged"}]}`)
+            } 
+            if (player.getDynamicProperty("kkons:blaster_charge") == undefined) { 
+                player.setDynamicProperty("kkons:blaster_charge", 0) 
+            }
         }
 
         //Handles blob blaster projectiles, needs moving to a function
 
-        if (player.getTags().includes("using_blobblaster") && blasterUpdateTick == 2) {
+        if (player.getTags().includes("using_blobblaster") && blasterUpdateTick == 3) {
 
             let durability = heldItem.getComponent(ItemComponentTypes.Durability) as ItemDurabilityComponent
             let blasterAmmo = "none"
@@ -237,7 +279,7 @@ s.runInterval(() => {
 
                 //need to add other goo variants
                 let projectile = player.dimension.spawnEntity(blasterAmmo,MathUtils.addVectors(player.location,{x:0,y:1.6,z:0}));
-                player.runCommandAsync(`playsound fall.slime @a ${player.location.x} ${player.location.y} ${player.location.z} 0.5`)
+                player.runCommand(`playsound fall.slime @a ${player.location.x} ${player.location.y} ${player.location.z} 0.5`)
                 //impulse/velocity = player aim
                 projectile.applyImpulse({x:player.getViewDirection().x*2, 
                     y:player.getViewDirection().y*2+0.2, 
@@ -265,22 +307,23 @@ const BlobBlaster = {
         let itemstack = event.itemstack as ItemStack;
         
         //handles gun animations
-        source.runCommandAsync(`playanimation @s animation.kkons_player.blaster_heavy root 0.001 "!query.equipped_item_any_tag('slot.weapon.mainhand', 'kkons:blaster')"`);
+        //source.runCommand(`playanimation @s animation.kkons_player.blaster_heavy root 0.001 "!query.equipped_item_any_tag('slot.weapon.mainhand', 'kkons:blaster')"`);
 
     }
 };
 
 /** @type {import("@minecraft/server").BlockCustomComponent} */
 const GooVirus = {
-    onTick(event) {
-        const block = event.block as Block;
-        const dimension = event.dimension as Dimension;
+    onTick(event:BlockComponentTickEvent) {
+        const block = event.block;
+        const dimension = event.dimension;
         const bl = block.location
 
-        dimension.runCommandAsync(`fill ${bl.x - 1} ${bl.y - 1} ${bl.z - 1} ${bl.x + 1} ${bl.y + 1} ${bl.z + 1} kkons:blobblaster_block_virus replace kkons:blobblaster_block_goo`);
-        dimension.runCommandAsync(`fill ${bl.x - 1} ${bl.y - 1} ${bl.z - 1} ${bl.x + 1} ${bl.y + 1} ${bl.z + 1} kkons:blobblaster_block_virus replace kkons:blobblaster_block_sandy`);
-        dimension.runCommandAsync(`playsound mob.player.hurt_on_fire @a ${bl.x} ${bl.y} ${bl.z} 0.2 0.7`)
-        dimension.runCommandAsync(`particle minecraft:water_evaporation_bucket_emitter ${bl.x} ${bl.y} ${bl.z}`)
+        dimension.runCommand(`fill ${bl.x - 1} ${bl.y - 1} ${bl.z - 1} ${bl.x + 1} ${bl.y + 1} ${bl.z + 1} kkons:blobblaster_block_virus replace kkons:blobblaster_block_goo`);
+        dimension.runCommand(`fill ${bl.x - 1} ${bl.y - 1} ${bl.z - 1} ${bl.x + 1} ${bl.y + 1} ${bl.z + 1} kkons:blobblaster_block_virus replace kkons:blobblaster_block_sandy`);
+        dimension.runCommand(`playsound mob.player.hurt_on_fire @a ${bl.x} ${bl.y} ${bl.z} 0.2 0.7`);
+        dimension.spawnParticle('minecraft:basic_smoke_particle', bl)
+        //dimension.runCommand(`particle minecraft:water_evaporation_bucket_emitter ${bl.x} ${bl.y} ${bl.z}`)
         block.setType("minecraft:air");
     }
 }
@@ -317,24 +360,50 @@ const GravityBlock = {
         const dimension = event.dimension as Dimension;
         const bl = block.location;
         const bl1 = block.dimension.getBlock(bl).below(1);
-        if (bl1?.isAir || bl1?.isLiquid || !bl1.isValid() || mcArray.canReplace(bl1?.typeId)) {
-            block.setType("minecraft:air");
-            let fallingEntity = dimension.spawnEntity("kkons:blobblaster_se_sandy",MathUtils.addVectors(bl,entityOffset));
-            fallingEntity.setProperty("kkons:falling",true)
-            fallingEntity.applyImpulse({x:0,y:-0.1,z:0});
-        }
+        if (!(bl1?.isAir || bl1?.isLiquid || !bl1.isValid || mcArray.canReplace(bl1?.typeId))) {return;}
+        
+        block.setType("minecraft:air");
+        let fallingEntity = dimension.spawnEntity("kkons:blobblaster_se_sandy",MathUtils.addVectors(bl,entityOffset));
+        fallingEntity.setProperty("kkons:falling",true)
+        fallingEntity.applyImpulse({x:0,y:-0.1,z:0});
+        
     }
 }
 
-w.beforeEvents.worldInitialize.subscribe(({ itemComponentRegistry }) => {
-    itemComponentRegistry.registerCustomComponent("kkons:paletteknife", PaletteKnife);
-    itemComponentRegistry.registerCustomComponent("kkons:blobblaster", BlobBlaster);
-});
 
-w.beforeEvents.worldInitialize.subscribe(({ blockComponentRegistry }) => {
-    blockComponentRegistry.registerCustomComponent("kkons:goo_virus", GooVirus);
-    blockComponentRegistry.registerCustomComponent("kkons:gravity_block", GravityBlock);
-});
+
+function blobBlasterShoot(player : Player) {
+
+    let playerInv = player.getComponent('minecraft:inventory') as EntityInventoryComponent;
+    let playerCont = playerInv.container;
+    let heldItem = playerCont.getItem(player.selectedSlotIndex) as ItemStack;
+    let durability = heldItem.getComponent(ItemComponentTypes.Durability) as ItemDurabilityComponent
+    let blasterAmmo = "none"
+
+    if (heldItem.hasTag("kkons:blaster_goo")) {
+        blasterAmmo = "kkons:blobblaster_se_goo"
+    } else if (heldItem.hasTag("kkons:blaster_sandy")){
+        blasterAmmo = "kkons:blobblaster_se_sandy"
+    }
+
+    if ((durability.damage < durability.maxDurability || player.getGameMode() == 'creative') && blasterAmmo != "none") {
+
+        const charge = +player.getDynamicProperty("kkons:blaster_charge")
+        //need to add other goo variants
+        let projectile = player.dimension.spawnEntity(blasterAmmo,MathUtils.addVectors(player.location,{x:0,y:1.6,z:0}));
+        player.runCommand(`playsound fall.slime @a ${player.location.x} ${player.location.y} ${player.location.z} 0.5`);
+        
+        //impulse/velocity = player aim
+        projectile.applyImpulse({x:player.getViewDirection().x*2, 
+            y:player.getViewDirection().y*2+0.2, 
+            z:player.getViewDirection().z*2});
+
+        projectile.setDynamicProperty("kkons:goo_charge", charge+1);
+
+        durability.damage = durability.damage + (player.getGameMode() == 'creative' ? 0 : 1);
+        playerCont.setItem(player.selectedSlotIndex, heldItem);
+    }
+}
 
 function gooHandler(goo : Entity) {
     let block : string = undefined;
@@ -357,7 +426,7 @@ function gooHandler(goo : Entity) {
         if(!goo.getProperty("kkons:falling") || block != "kkons:blobblaster_block_sandy") {
 
             //fills local area with solid "goo"
-            createBlobSphere(goo.dimension, goo.location, block);
+            s.runJob(createBlobSphere(goo.dimension, goo.location, block, +goo.getDynamicProperty("kkons:goo_charge")));
             goo.remove();
         } else if(mcArray.canReplace(goo.dimension.getBlock(goo.location).typeId)&&(!mcArray.canReplace(goo.dimension.getBlock(goo.location).below(1).typeId))) {
             goo.dimension.getBlock(goo.location).setType(block);
@@ -368,15 +437,16 @@ function gooHandler(goo : Entity) {
     }
 }
 
-function createBlobSphere(dim : Dimension, loc : Vector3, material : string) {
-    for (let x = -3; x < 3; x++) {
-        for (let y = -3; y < 3; y++) {
-            for (let z = -3; z < 3; z++) {
+function* createBlobSphere(dim : Dimension, loc : Vector3, material : string, size : number) {
+    for (let x = -size; x < size; x++) {
+        for (let y = -size; y < size; y++) {
+            for (let z = -size; z < size; z++) {
                 let dLoc = {x:loc.x+x, y:loc.y+y, z:loc.z+z}
                 let dist = MathUtils.dist(dLoc,loc);
-                if (dist <= 1 + Math.random() && (mcArray.canReplace(dim.getBlock(dLoc).typeId) || dim.getBlock(dLoc).isAir)) {
+                if (dist <= size/2 - Math.random()/2 && (mcArray.canReplace(dim.getBlock(dLoc).typeId) || dim.getBlock(dLoc).isAir)) {
                     dim.setBlockType(dLoc, material);
                 }
+                yield;
             }
         }
     }
@@ -388,7 +458,99 @@ function gooVirus(block : Block, source : Player, mainhand) {
     if (source.getGameMode() != 'creative') {
         if (mainhand.amount > 1) {mainhand.amount--;}
         else {mainhand.setItem(undefined);}
+        (source.getComponent(EntityComponentTypes.Inventory) as EntityInventoryComponent).container?.addItem(new ItemStack("kkons:blobblastercell_empty"));
     }
+}
+
+
+//experimenting with gaussian smoothing on goo blocks
+function gooSmooth(dim : Dimension, origin : Vector3, r : number) {
+    
+    //get blocks and their locations within a radius around origin
+    let blocks = [];
+    for (let x = -r; x < r; x++) {
+        for (let y = -r; y < r; y++) {
+            for (let z = -r; z < r; z++) {
+                let dLoc = {x:origin.x+x, y:origin.y+y, z:origin.z+z}
+                let dist = MathUtils.dist(dLoc,origin);
+                if (dist<=r) {
+                    const block = dim.getBlock(dLoc);
+                    if (block.isValid && block != undefined && !(block.isAir||block.isLiquid)) {
+                        if (block.typeId.includes("kkons:blobblaster")) {
+                            blocks.push({b:block,v3:block.location,nV3:block.location,typeId:block.typeId,dist:dist});
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //for each block, calc the "weight" for gaussian smooth using neighbours
+    blocks.forEach(bD => {
+
+
+        //get neighbour vectors
+        let v3 = bD.v3;
+        let nV3 = bD.nV3;
+        let sumV3 = {x:0,y:0,z:0};
+        let neighbours = 0;
+        for (let x = -2; x < 2; x++) {
+            for (let y = -2; y < 2; y++) {
+                for (let z = -2; z < 2; z++) {
+                    const offset = {x:x, y:y, z:z}
+                    let dV3 = MathUtils.addVectors(v3,offset); 
+                    let dist = bD.dist
+                    //MathUtils.dist(v3,dV3);
+                    let neighbour = dim.getBlock(dV3);
+                    dist*=0.75;
+                    if (dist<1) dist=1;
+                    {
+                        if (!neighbour.isAir && !neighbour.isLiquid) {
+                            if (neighbour.typeId.includes("kkons:blobblaster")) {
+                            //adds the vectors
+                            ///should become less prominent with distance
+                            sumV3.x+=(x/dist);
+                            sumV3.y+=(y/dist);
+                            sumV3.z+=(z/dist);
+                            neighbours++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        //get the weight vector3 for where to move the block
+        let avgV3 : Vector3 = {x:0,y:0,z:0};
+        avgV3.x = Math.round(sumV3.x/neighbours);
+        avgV3.y = Math.round(sumV3.y/neighbours);
+        avgV3.z = Math.round(sumV3.z/neighbours);
+        
+        nV3 = MathUtils.addVectors(v3,avgV3);
+
+        bD.nV3 = nV3;
+    });
+
+    //now that each block has a weight, "push" the block to that new spot
+    blocks.forEach(bD => {
+        let block = bD.block as Block;
+        let oldPosition : Vector3 = bD.v3;
+        let newPosition : Vector3 = bD.nV3;
+
+        if(oldPosition==newPosition) {return;}
+
+        dim.getBlock(oldPosition).setType("minecraft:air");
+    });
+
+    blocks.forEach(bD => {
+        let block = bD.block as Block;
+        let oldPosition : Vector3 = bD.v3;
+        let newPosition : Vector3 = bD.nV3;
+
+        if(oldPosition==newPosition) {return;}
+
+        dim.getBlock(newPosition).setType(bD.typeId);
+    });
 }
 
 

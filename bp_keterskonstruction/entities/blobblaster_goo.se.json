@@ -19,68 +19,31 @@
         "components": {
             "minecraft:type_family": {"family": ["kkons:goo"]},
             "minecraft:collision_box": {
-                "height": 0.5,
-                "width": 0.5
-            },
-            "minecraft:physics": {
-                "has_collision": true,
-                "has_gravity": false
+                "width": 0.25,
+                "height": 0.25
             },
             "minecraft:projectile": {
-                "anchor": 0,
-                "angle_offset": 0,
-                "catch_fire": false,
-                "crit_particle_on_hurt": false,
-                "destroy_on_hurt": false,
-                "filter": "",
-                "fire_affected_by_griefing": false,
-                "gravity": 0.1,
-                "hit_sound": "",
-                "homing": false,
-                "inertia": 0.99,
-                "is_dangerous": false,
-                "knockback": false,
-                "lightning": false,
-                "liquid_inertia": 0.6,
-                "multiple_targets": true,
-                "offset": [],
-                "on_fire_time": 5,
-                "on_hit": {
-                    "stick_in_ground": {
-                        "shake_time": 0.35
-                    },
-                    "definition_event": {
-                        "event_trigger": "kkons:event_goo_collide"
-                    }
+              "on_hit": {
+                    "stick_in_ground": {}
                 },
-                "particle": "iconcrack",
-                "potion_effect": -1,
-                "power": 1.3,
-                "reflect_on_hurt": false,
-                "semi_random_diff_damage": false,
-                "shoot_sound": "",
-                "should_bounce": false
+                "anchor": 0,
+                "gravity": 0.05,
+                "inertia": 0.99,
+                "angle_offset": 0.0,
+                "offset": [ 0, 0, 0 ],
+                "is_dangerous": false
             },
-            "minecraft:damage_sensor": {
-                "triggers": [
-                    {
-                        "cause": "all",
-                        "deals_damage": "no"
-                    }
-                ]
-            }
-        },
-        "component_groups": {
-            "kkons:variant1": {
-                "minecraft:variant": {"value": 1}
-            }
-        },
-        "events": {
-            "kkons:entity_goo_collide": {
-                "add":{
-                    "component_groups": [
-                        "kkons:variant1"
-                    ]
+	        "minecraft:physics": {
+            },
+            "minecraft:pushable": {
+                "is_pushable": true,
+                "is_pushable_by_piston": true
+            },
+            "minecraft:conditional_bandwidth_optimization": {
+                "default_values": {
+                    "max_optimized_distance": 100.0,
+                    "max_dropped_ticks": 7,
+                    "use_motion_prediction_hints": true
                 }
             }
         }

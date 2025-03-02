@@ -15,6 +15,7 @@
 					"scale": 0.6
 				},
 				"_cell": {
+					"rotation": [0, 0, 90],
 					"scale": 0.5
 				}
 			}
@@ -33,10 +34,15 @@
 					"scale": 1.2
 				},
 				"_cell": {
+					"rotation": [0, "0+math.pow(q.item_in_use_duration/40, 2)*query.is_using_item", 90],
 					"scale": 0.5
 				},
 				"_geo": {
-					"position": [0, 0, "1+q.is_using_item*2"]
+					"position": [
+						"math.clamp(math.random(-1,1)*(q.is_using_item*q.item_in_use_duration)/4000,-1,1)",
+						"math.clamp(math.random(-1,1)*(q.is_using_item*q.item_in_use_duration/4000),-1,1)",
+						"q.is_sneaking * (q.is_using_item ? 2 : 0)"
+					]
 				}
 			}
 		},

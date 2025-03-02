@@ -7,20 +7,23 @@
                 "default": "snowball"
             },
             "textures": {
-                "default": "textures/items/slimeball"
+                "default": "textures/kkons/items/materials/goo"
             },
             "geometry": {
-                "default": "geometry.item_sprite"
+                "default": "geometry.blobblaster_shot"
             },
             "render_controllers": [ "controller.render.item_sprite" ],
             "animations": {
-                "flying": "animation.actor.billboard"
+                "flying": "animation.blobblaster_shot.billboard"
             },
             "scripts": {
                 "scale": "(0.75)",
                 "animate": [
                     "flying"
                 ]
+            },
+            "particle_effects": {
+                "goo" : "kkons:blobblaster_goo" 
             }
         }
     }

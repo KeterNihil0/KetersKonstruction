@@ -19,7 +19,7 @@
             "minecraft:loot": "loot_tables/none.json",
             
             "minecraft:tick": {
-                "interval_range": [2,4],
+                "interval_range": [5,10],
                 "looping": true
             },
             "minecraft:custom_components": [
