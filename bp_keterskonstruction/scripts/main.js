@@ -89,6 +89,7 @@ w.beforeEvents.playerBreakBlock.subscribe((data) => {
     }
 });
 w.afterEvents.itemStopUse.subscribe((data) => {
+    //data.source.setDynamicProperty("kkons:blockblaster_charge", 0);
     //will attempt to remove any "Using" tags from the player
     const source = data.source;
     if (source.hasTag("using_blobblaster")) {
@@ -103,11 +104,14 @@ w.afterEvents.itemStopUse.subscribe((data) => {
         catch (error) {
         }
     }
+    //source.setDynamicProperty("kkons:blockblaster_charge", 0);
     if (source.hasTag("using_blockblaster")) {
         try {
             source.removeTag("using_blockblaster");
             if (+source.getDynamicProperty("kkons:blockblaster_charge") > 0) {
+                blockBlasterShoot(source);
                 source.setDynamicProperty("kkons:blockblaster_charge", 0);
+                console.log(source.getDynamicProperty("kkons:blockblaster_charge"));
             }
         }
         catch (error) {
@@ -128,6 +132,7 @@ w.afterEvents.itemUse.subscribe((data) => {
         //source.runCommand(`say player using Blockblaster`);
         try {
             source.addTag("using_blockblaster");
+            console.log(`using blockblaster`);
         }
         catch (error) { }
     }
@@ -200,27 +205,38 @@ w.beforeEvents.playerInteractWithBlock.subscribe((data) => {
     if (!source) {
         return;
     }
-    if (!block.typeId.includes("kkons:blobblaster")) {
-        data.cancel;
-        return;
-    }
-    if (source.isSneaking) {
-        data.cancel;
-        return;
-    }
     const equippable = source.getComponent(EntityComponentTypes.Equippable);
     if (!equippable)
         return;
     const mainhand = equippable.getEquipmentSlot(EquipmentSlot.Mainhand);
-    if (mainhand.hasItem() && data.isFirstEvent && mainhand.typeId == "kkons:blobblaster_cell_virus" || mainhand.typeId == "kkons:blobblaster_cell_viralgoo") {
-        s.run(() => { gooVirus(block, source, mainhand); });
-        data.cancel;
+    if (mainhand.hasItem() && data.isFirstEvent) {
+        if (source.isSneaking && mainhand.typeId == "kkons:blobblaster_cell_virus" || mainhand.typeId == "kkons:blobblaster_cell_viralgoo") {
+            s.run(() => { gooVirus(block, source, mainhand); });
+            data.cancel;
+        }
+        if (mainhand.typeId == "kkons:blockblaster") {
+            s.run(() => { blockBlasterSelect(block, source); });
+        }
     }
 });
 w.afterEvents.projectileHitBlock.subscribe((data) => {
     let projectile = data.projectile;
     if (projectile.typeId.includes("kkons:blobblaster")) {
         s.run(() => { gooHandlerV2(projectile); });
+    }
+    if (projectile.typeId.includes("kkons:blockblaster")) {
+        s.run(() => {
+            if (data.getBlockHit().block.typeId.includes("kkons:blobblaster")) {
+                data.getBlockHit().block.setType(projectile.getDynamicProperty("kkons:blockblaster_block"));
+            }
+            else if (seachForNearbyGoo(data.getBlockHit().block, 2) != undefined) {
+                projectile.dimension.getBlock(seachForNearbyGoo(data.getBlockHit().block, 2)).setType(projectile.getDynamicProperty("kkons:blockblaster_block"));
+            }
+            else {
+                projectile.dimension.spawnItem(new ItemStack(projectile.getDynamicProperty("kkons:blockblaster_block")), projectile.location);
+            }
+            projectile.remove();
+        });
     }
 });
 w.beforeEvents.chatSend.subscribe((data) => {
@@ -254,11 +270,13 @@ s.runInterval(() => {
             if (player.getDynamicProperty("kkons:blobblaster_charge") == undefined) {
                 player.setDynamicProperty("kkons:blobblaster_charge", 0);
             }
+            const blockBlasterCharge = player.getDynamicProperty("kkons:blockblaster_charge");
             if (+player.getDynamicProperty("kkons:blockblaster_charge") < 6 && player.hasTag("using_blockblaster")) {
+                console.log(`still using blockblaster`);
                 player.setDynamicProperty("kkons:blockblaster_charge", +player.getDynamicProperty("kkons:blockblaster_charge") + 1);
                 player.runCommand(`titleraw @s actionbar {"rawtext":[{"text":"${Math.round((+player.getDynamicProperty("kkons:blockblaster_charge") / 6) * 100)}% charged"}]}`);
             }
-            if (player.getDynamicProperty("kkons:blockblaster_charge") == undefined) {
+            if (+player.getDynamicProperty("kkons:blockblaster_charge") == undefined) {
                 player.setDynamicProperty("kkons:blockblaster_charge", 0);
             }
         }
@@ -712,6 +730,66 @@ async function gooSmoothV3(dim, o, r) {
             dim.getBlock(newPosition).setType(bD.typeId);
         }
     });
+}
+function blockBlasterSelect(block, source) {
+    source.setDynamicProperty("kkons:blockblaster_block", block.typeId);
+    source.runCommand(`say Will now fire ${source.getDynamicProperty("kkons:blockblaster_block")}`);
+}
+function blockBlasterShoot(player) {
+    let playerInv = player.getComponent('minecraft:inventory');
+    let playerCont = playerInv.container;
+    let heldItem = playerCont.getItem(player.selectedSlotIndex);
+    let durability = heldItem.getComponent(ItemComponentTypes.Durability);
+    const blasterAmmo = player.getDynamicProperty("kkons:blockblaster_block");
+    if (searchInv("minecraft:gunpowder", playerInv).amount > 0 && searchInv(blasterAmmo, playerInv).amount > 0) {
+        if ((player.getGameMode() == 'creative') && blasterAmmo != undefined) {
+            const charge = +player.getDynamicProperty("kkons:blockblaster_charge");
+            console.log(`firing blockblaster`);
+            player.runCommand(`playsound fall.slime @a ${player.location.x} ${player.location.y} ${player.location.z} 0.5`);
+            for (let i = 0; i < (charge * 2 + 1); i++) {
+                let projectile = player.dimension.spawnEntity("kkons:blockblaster_se_shot", player.getHeadLocation());
+                projectile.applyImpulse({
+                    x: player.getViewDirection().x * 2 + (Math.random() - 0.5) * 0.3,
+                    y: player.getViewDirection().y * 2 + (Math.random() - 0.5) * 0.3,
+                    z: player.getViewDirection().z * 2 + (Math.random() - 0.5) * 0.3
+                });
+                projectile.setDynamicProperty("kkons:block_charge", charge + 1);
+                projectile.setDynamicProperty("kkons:blockblaster_block", blasterAmmo);
+            }
+            //impulse/velocity = player aim
+            //if (player.getGameMode() != 'creative') {
+            //    if(durability.damage<durability.maxDurability) durability.damage++;
+            //    else heldItem = undefined;
+            //}
+        }
+    }
+}
+function seachForNearbyGoo(block, r) {
+    for (let x = -r; x < r; x++) {
+        for (let y = -r; y < r; y++) {
+            for (let z = -r; z < r; z++) {
+                const v3 = { x: x, y: y, z: z };
+                const gooCheck = MathUtils.addVectors(v3, block.location);
+                if (block.dimension.getBlock(gooCheck).typeId.includes("kkons:blobblaster")) {
+                    return gooCheck;
+                }
+            }
+        }
+    }
+    return undefined;
+}
+function searchInv(typeId, inv) {
+    let cont = inv.container;
+    for (let i = 0; i < cont.size; i++) {
+        const item = cont.getItem(i);
+        if (item) {
+            if (typeId == item.typeId) {
+                return { slot: i, amount: item.amount };
+            }
+        }
+    }
+    console.log(`could not find any ${typeId}`);
+    return undefined;
 }
 //util
 const entityOffset = { x: 0.5, y: 0.5, z: 0.5 };

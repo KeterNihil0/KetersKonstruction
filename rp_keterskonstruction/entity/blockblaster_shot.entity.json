@@ -1,0 +1,30 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "kkons:blockblaster_se_shot",
+            "materials": {
+                "default": "snowball"
+            },
+            "textures": {
+                "default": "textures/blocks/cobblestone"
+            },
+            "geometry": {
+                "default": "geometry.blobblaster_shot"
+            },
+            "render_controllers": [ "controller.render.item_sprite" ],
+            "animations": {
+                "flying": "animation.blobblaster_shot.billboard"
+            },
+            "scripts": {
+                "scale": "(0.25)",
+                "animate": [
+                    "flying"
+                ]
+            },
+            "particle_effects": {
+                "goo" : "kkons:blobblaster_sandy" 
+            }
+        }
+    }
+}

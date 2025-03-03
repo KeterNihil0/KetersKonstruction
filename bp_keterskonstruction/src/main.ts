@@ -1,4 +1,4 @@
-import { Block, BlockComponentTickEvent, Dimension, Entity, EntityComponentTypes, EntityEquippableComponent, EntityInventoryComponent, EquipmentSlot, ItemComponentTypes, ItemCooldownComponent, ItemDurabilityComponent, ItemStack, Player, system as s, Vector3, world as w } from "@minecraft/server";
+import { Block, BlockComponentTickEvent, Dimension, Entity, EntityComponentTypes, EntityEquippableComponent, EntityInventoryComponent, EntityTameableComponent, EquipmentSlot, ItemComponentTypes, ItemCooldownComponent, ItemDurabilityComponent, ItemStack, Player, system as s, Vector3, world as w } from "@minecraft/server";
 import { MathUtils } from "mathUtils";
 import { mcArray } from "mcArrays";
 
@@ -97,6 +97,8 @@ w.beforeEvents.playerBreakBlock.subscribe((data) => {
 })
 
 w.afterEvents.itemStopUse.subscribe((data)=> {
+
+    //data.source.setDynamicProperty("kkons:blockblaster_charge", 0);
     
     //will attempt to remove any "Using" tags from the player
     const source = data.source;
@@ -113,11 +115,15 @@ w.afterEvents.itemStopUse.subscribe((data)=> {
         }
     } 
 
+    //source.setDynamicProperty("kkons:blockblaster_charge", 0);
+
     if (source.hasTag("using_blockblaster")) {
         try {
             source.removeTag("using_blockblaster");
             if(+source.getDynamicProperty("kkons:blockblaster_charge") > 0) {
+                blockBlasterShoot(source);
                 source.setDynamicProperty("kkons:blockblaster_charge", 0);
+                console.log(source.getDynamicProperty("kkons:blockblaster_charge"))
             }
         } catch (error) {
 
@@ -140,6 +146,7 @@ w.afterEvents.itemUse.subscribe((data)=> {
         //source.runCommand(`say player using Blockblaster`);
         try {
             source.addTag("using_blockblaster");
+            console.log(`using blockblaster`)
         } catch (error) {}
     }
 })
@@ -220,18 +227,20 @@ w.beforeEvents.playerInteractWithBlock.subscribe((data)=> {
 
     if(!source) {return;}
 
-    if(!block.typeId.includes("kkons:blobblaster")) {data.cancel; return;}
-
-    if(source.isSneaking) {data.cancel; return;}
-
     const equippable = source.getComponent(EntityComponentTypes.Equippable) as EntityEquippableComponent;
     if (!equippable) return;
 
     const mainhand = equippable.getEquipmentSlot(EquipmentSlot.Mainhand);
-    if (mainhand.hasItem() && data.isFirstEvent && mainhand.typeId == "kkons:blobblaster_cell_virus" || mainhand.typeId == "kkons:blobblaster_cell_viralgoo") 
-    {
-        s.run(()=> {gooVirus(block,source,mainhand);});
-        data.cancel;
+
+    if (mainhand.hasItem() && data.isFirstEvent) {
+        if (source.isSneaking && mainhand.typeId == "kkons:blobblaster_cell_virus" || mainhand.typeId == "kkons:blobblaster_cell_viralgoo")
+        {
+            s.run(()=> {gooVirus(block,source,mainhand);});
+            data.cancel;
+        }
+        if (mainhand.typeId == "kkons:blockblaster") {
+            s.run(()=> {blockBlasterSelect(block,source);});
+        }
     }
 })
 
@@ -239,6 +248,21 @@ w.afterEvents.projectileHitBlock.subscribe((data) => {
     let projectile = data.projectile;
     if (projectile.typeId.includes("kkons:blobblaster")) {
         s.run(()=>{gooHandlerV2(projectile)});
+    }
+
+    if (projectile.typeId.includes("kkons:blockblaster")) {
+        s.run(()=>{
+
+            if(data.getBlockHit().block.typeId.includes("kkons:blobblaster")) {
+                data.getBlockHit().block.setType(projectile.getDynamicProperty("kkons:blockblaster_block") as string);
+            }else if (seachForNearbyGoo(data.getBlockHit().block,2) != undefined) {
+                projectile.dimension.getBlock(seachForNearbyGoo(data.getBlockHit().block,2)).setType(projectile.getDynamicProperty("kkons:blockblaster_block") as string);
+            }
+            else {
+                projectile.dimension.spawnItem(new ItemStack(projectile.getDynamicProperty("kkons:blockblaster_block") as string), projectile.location);
+            }
+            projectile.remove();
+        })
     }
 })
 
@@ -279,11 +303,14 @@ s.runInterval(() => {
                 player.setDynamicProperty("kkons:blobblaster_charge", 0) 
             }
 
+            const blockBlasterCharge = player.getDynamicProperty("kkons:blockblaster_charge") as number;
+
             if(+player.getDynamicProperty("kkons:blockblaster_charge") < 6 && player.hasTag("using_blockblaster")) {
+                console.log(`still using blockblaster`)
                 player.setDynamicProperty("kkons:blockblaster_charge", +player.getDynamicProperty("kkons:blockblaster_charge") + 1);
                 player.runCommand(`titleraw @s actionbar {"rawtext":[{"text":"${Math.round((+player.getDynamicProperty("kkons:blockblaster_charge")/6)*100)}% charged"}]}`)
             } 
-            if (player.getDynamicProperty("kkons:blockblaster_charge") == undefined) { 
+            if (+player.getDynamicProperty("kkons:blockblaster_charge") == undefined) { 
                 player.setDynamicProperty("kkons:blockblaster_charge", 0) 
             }
         }
@@ -429,6 +456,8 @@ function blobBlasterShoot(player : Player) {
         //need to add other goo variants
         let projectile = player.dimension.spawnEntity(blasterAmmo,MathUtils.addVectors(player.location,{x:0,y:1.6,z:0}));
         player.runCommand(`playsound fall.slime @a ${player.location.x} ${player.location.y} ${player.location.z} 0.5`);
+
+        
         
         //impulse/velocity = player aim
         projectile.applyImpulse({x:player.getViewDirection().x*2, 
@@ -802,6 +831,82 @@ async function gooSmoothV3(dim : Dimension, o : Vector3, r : number) {
         dim.getBlock(newPosition).setType(bD.typeId);
         }
     });
+}
+
+
+function blockBlasterSelect(block:Block,source:Player) {
+    source.setDynamicProperty("kkons:blockblaster_block",block.typeId);
+    source.runCommand(`say Will now fire ${source.getDynamicProperty("kkons:blockblaster_block")}`)
+}
+
+function blockBlasterShoot(player : Player){
+    let playerInv = player.getComponent('minecraft:inventory') as EntityInventoryComponent;
+    let playerCont = playerInv.container;
+    let heldItem = playerCont.getItem(player.selectedSlotIndex) as ItemStack;
+    let durability = heldItem.getComponent(ItemComponentTypes.Durability) as ItemDurabilityComponent
+
+    const blasterAmmo = player.getDynamicProperty("kkons:blockblaster_block") as string;
+
+    if(searchInv("minecraft:gunpowder",playerInv).amount>0 && searchInv(blasterAmmo, playerInv).amount>0)
+    {
+        
+        if ((player.getGameMode() == 'creative') && blasterAmmo != undefined) {
+            
+            const charge = +player.getDynamicProperty("kkons:blockblaster_charge");
+
+            console.log(`firing blockblaster`);
+
+            
+            player.runCommand(`playsound fall.slime @a ${player.location.x} ${player.location.y} ${player.location.z} 0.5`);
+
+            for (let i = 0; i < (charge*2+1); i++) {
+                let projectile = player.dimension.spawnEntity("kkons:blockblaster_se_shot",player.getHeadLocation());
+
+                projectile.applyImpulse({
+                    x:player.getViewDirection().x*2+(Math.random()-0.5)*0.3, 
+                    y:player.getViewDirection().y*2+(Math.random()-0.5)*0.3, 
+                    z:player.getViewDirection().z*2+(Math.random()-0.5)*0.3});
+    
+                projectile.setDynamicProperty("kkons:block_charge", charge+1);
+                projectile.setDynamicProperty("kkons:blockblaster_block", blasterAmmo as string);
+            }
+            //impulse/velocity = player aim
+            //if (player.getGameMode() != 'creative') {
+            //    if(durability.damage<durability.maxDurability) durability.damage++;
+            //    else heldItem = undefined;
+            //}
+        }
+    }
+}
+
+function seachForNearbyGoo(block : Block, r:number) {
+    for (let x = -r; x < r; x++) {
+        for (let y = -r; y < r; y++) {
+            for (let z = -r; z < r; z++) {
+                const v3 = {x:x, y:y, z:z};
+                const gooCheck = MathUtils.addVectors(v3,block.location) as Vector3;
+                if(block.dimension.getBlock(gooCheck).typeId.includes("kkons:blobblaster")) {
+                    return gooCheck;
+                }
+            }
+        }
+    }
+    return undefined;
+}
+
+function searchInv(typeId : String, inv : EntityInventoryComponent) {
+    let cont = inv.container;
+    for (let i = 0; i < cont.size; i++) {
+        const item = cont.getItem(i);
+        if (item) {
+            if (typeId == item.typeId) {
+                return {slot:i,amount:item.amount};
+            }
+        }
+    }
+
+    console.log(`could not find any ${typeId}`)
+    return undefined;
 }
 
 //util
